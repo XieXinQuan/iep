@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.UserDao">
+	<select id="checkName" parameterType="string" resultType="java.lang.Integer">
+		select count(*) from user where login_name = #{login_name}
+	</select>
+	<select id="login" parameterType="string" resultType="QuanDiary.entity.User">
+		select * from user where login_name = #{login_name}
+	</select>
+	<insert id="save" parameterType="QuanDiary.entity.User">
+		insert into user(company,dept, login_name, display_name, password, status, user_type) 
+			values(#{company}, #{dept}, #{login_name}, #{display_name}, #{password}, #{status}, #{user_type})
+	</insert>
+	<select id="userType" parameterType="java.lang.Long" resultType="java.lang.Integer">
+		select user_type from user where status != 92 and id = #{id} 
+	</select>
+	<select id="userCompany" parameterType="java.lang.Long" resultType="java.lang.Long">
+		select company from user where status != 92 and id = #{id} 
+	</select>
+	<select  id="testMap" resultType="java.util.HashMap">
+	    select login_name as loginName,display_name from user
+	</select>
+	<select  id="testParameters" resultType="java.util.HashMap">
+	    select login_name as loginName,display_name from user 
+	    	where login_name like #{loginName} and status = #{status}
+	</select>
+	<select  id="testParameters1" resultType="java.util.HashMap">
+	    select login_name as loginName,display_name from user 
+	    	where login_name like #{0} and status = #{1}
+	</select>
+	<select id="loadName" parameterType="java.lang.Long" resultType="java.lang.String">
+		select display_name from user where id = #{userId} 
+	</select>
+	<select id="loadUserById" parameterType="java.lang.Long" resultType="QuanDiary.entity.User">
+		select * from user where id = #{userId} 
+	</select>
+	<select id="loadCompanyByCompany" parameterType="java.lang.Long" resultType="QuanDiary.entity.Company">
+		select * from company where id = #{0}
+	</select>
+	<select id="loadUserByCompanyButDeptNull" parameterType="java.lang.Long" resultType="QuanDiary.entity.User">
+		select * from user where company = #{0} and dept is null
+	</select>
+	<select id="loadUserByDept" parameterType="java.lang.Long" resultType="QuanDiary.entity.User">
+		select * from user where dept = #{0} and status != 92
+	</select>
+	<insert id="addEmployeeBatch" parameterType="java.util.List" useGeneratedKeys="true">  
+    	insert into user (company,login_name,display_name,password,status,user_type)  
+    	values   
+    	<foreach collection="list" item="item" index="index" separator="," >  
+    	
+        (#{item.company},#{item.login_name},#{item.display_name},#{item.password},#{item.status},#{item.user_type})  
+    	</foreach>  
+    </insert> 
+    <select id="loadDeptUser" resultType="QuanDiary.entity.User">
+		select * from user 
+			where dept = #{0} and status != 92 
+			order by user_type desc 
+			limit #{1}, #{2}
+	</select>
+	<select id="loadDeptUserCount" parameterType="java.lang.Long" resultType="java.lang.Integer">
+		select count(id) from user where dept = #{0} and status != 92
+	</select>
+	<select id="loadCompanyUser" resultType="java.util.HashMap">
+		select u.id as id, u.login_name as loginName,u.display_name as displayName
+			, u.status as status, u.user_type as userType, d.name as deptName
+		from user u left join dept d on d.id = u.dept 
+			where u.company = #{0} and u.status != 92 order by u.user_type desc 
+			limit #{1}, #{2} 
+	</select>
+	<select id="loadCompanyUserCount" resultType="java.lang.Integer" parameterType="java.lang.Long" >
+		select count(id) from user 
+			where company = #{0} and status != 92 
+	</select>
+	<select id="loadCompanyUserNoDept" resultType="java.util.HashMap">
+		select u.id as id, u.login_name as loginName,u.display_name as displayName
+			, u.status as status, u.user_type as userType, d.name as deptName
+		from user u left join dept d on d.id = u.dept 
+			where u.company = #{0} and u.dept is null and u.status != 92 order by u.user_type desc 
+			limit #{1}, #{2} 
+	</select>
+	<select id="loadCompanyUserCountNoDept" resultType="java.lang.Integer" parameterType="java.lang.Long" >
+		select count(id) from user 
+			where company = #{0} and dept is null and status != 92 
+	</select>
+	<update id="updateUserStatus" parameterType="QuanDiary.entity.User">
+        update user
+        <set>
+        	<if test="dept != null">dept=#{dept},</if>
+        	<if test="display_name != null">display_name=#{display_name},</if>
+        	<if test="password != null">password=#{password},</if>
+        	<if test="status != null">status=#{status},</if>
+        	<if test="user_type != null">user_type=#{user_type}</if>
+        </set>
+        where id=#{id}
+	</update>
+	<select id="loadAllAskOfLeaveUser" resultType="QuanDiary.entity.User">
+	SELECT * FROM user where status in 
+		<foreach collection="list" item="status" index="index" open="(" close=")" separator=",">
+		  #{status}
+		</foreach>
+
+	
+		
+	</select>
+</mapper>

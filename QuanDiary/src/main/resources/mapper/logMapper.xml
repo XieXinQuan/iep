@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.LogDao">
+	<insert id="save" parameterType="QuanDiary.entity.Log" useGeneratedKeys="true" keyProperty="id">
+		insert into log(user,company,template,title,memo,status,create_time) 
+			values (#{user}, #{company}, #{template}, #{title}, #{memo}, #{status}, #{create_time})
+	</insert>
+	<!-- 加载我的日志列表 -->
+	<select id="loadMyLog" resultType="QuanDiary.entity.Log">
+		select * from log 
+			where user = #{0} 
+				and status != 92
+				
+			order by id desc 
+			limit #{1}, #{2}
+	</select>
+	<select id="countByLoadMyLog" resultType="java.lang.Integer">
+		select count(id) from log 
+			where user = #{0} 
+			and status= #{1}
+	</select>
+		<!-- 加载其他员工日志列表 -->
+	<select id="loadOtherUserLog" resultType="java.util.HashMap">
+		select l.id as id, l.title as title, u.display_name as userName, 
+			
+			d.name as deptName, unix_timestamp(l.create_time) as createTime ,
+			(select count(lr.id) from log_read lr where lr.log = l.id) as logReadNum,
+			(select count(ll.id) from log_like ll where ll.log = l.id) as logLikeNum
+			from log l 
+				left join user u on l.user = u.id 
+				LEFT JOIN dept d on d.id = u.dept 
+			where l.status = 1 and u.id = #{id} 
+				ORDER BY l.create_time DESC 
+					LIMIT #{page},#{rows}
+
+	</select>
+
+	<select id="countByLoadOtherUserLog" resultType="java.lang.Integer">
+		select count(l.id) from log l
+				left join user u on l.user = u.id
+				LEFT JOIN dept d on d.id = u.dept
+			where l.status = 1 and u.id = #{0}
+
+	</select>
+			<!-- 加载其他员工日志列表   公司全部除了某位-->
+	<select id="loadOtherUserLogIsCompany" resultType="java.util.HashMap">
+		<!-- select l.id as id, l.title as title, u.display_name as userName, d.name as deptName, 
+			(select count(lr.id) from log_read lr where lr.log = l.id) as logReadNum,
+			(select count(ll.id) from log_like ll where ll.log = l.id) as logLikeNum,
+			unix_timestamp(l.create_time) as createTime from log l 
+				left join user u on l.user = u.id 
+				LEFT JOIN dept d on d.id = u.dept 
+			where l.status = 1 and l.company = #{0} and u.id != #{1} 
+				ORDER BY l.create_time DESC 
+					LIMIT #{2},#{3}-->
+					
+			select l.id as id, l.title as title, lt.title as moduleTitle, u.display_name as userName, d.name as deptName, 
+			(select count(lr.id) from log_read lr where lr.log = l.id) as logReadNum,
+			(select count(lr.id) from log_read lr where lr.log = l.id and lr.user = #{currUser}) as isRead,
+			(select count(ll.id) from log_like ll where ll.log = l.id) as logLikeNum,
+			unix_timestamp(l.create_time) as createTime from log l 
+				left join user u on l.user = u.id 
+				LEFT JOIN dept d on d.id = u.dept 
+				LEFT JOIN log_template lt on lt.id = l.template
+			where l.status = 1 
+					<if test="company != null">
+						and l.company = #{company} 
+					</if>
+			 
+					and u.id != #{currUser} 
+					<if test="targetUser != null">
+						and u.id = #{targetUser} 
+					</if>
+					<if test="dept != null">
+						and d.id = #{dept} 
+					</if>
+					<if test="isNoDept != null">
+						and d.id is null 
+					</if>
+					<if test="time != null">
+						and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time} 
+					</if>
+					<if test="startTime != null">
+						and l.create_time > #{startTime}
+						and l.create_time &lt; #{endTime}
+						
+					</if>
+
+				ORDER BY l.create_time DESC 
+					LIMIT #{page}, #{rows}
+	</select>
+
+	<select id="countByLoadOtherUserLogIsCompany" resultType="java.lang.Integer">
+		<!-- select count(l.id) from log l
+				left join user u on l.user = u.id
+				LEFT JOIN dept d on d.id = u.dept
+			where l.status = 1 and l.company = #{0} and u.id != #{1}-->
+			
+			select count(l.id) from log l 
+				left join user u on l.user = u.id 
+				LEFT JOIN dept d on d.id = u.dept 
+				LEFT JOIN log_template lt on lt.id = l.template
+			where l.status = 1 and l.company = #{company} 
+					and u.id != #{currUser} 
+					<if test="targetUser != null">
+						and u.id = #{targetUser}
+					</if>
+					<if test="dept != null">
+						and d.id = #{dept}
+					</if>
+					<if test="isNoDept != null">
+						and d.id is null
+					</if>
+					<if test="time != null">
+						and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time}
+					</if>
+					<if test="startTime != null">
+						and l.create_time > #{startTime} 
+						and l.create_time &lt; #{endTime}
+					</if>
+
+
+	</select>
+	
+				<!-- 加载其他员工日志列表   公司全部除了某位    导出excel使用 -->
+	<select id="loadOtherUserLogIsCompanyByExportExcel" resultType="java.util.HashMap">
+
+			select l.id as id, l.title as title, l.template as templateId,
+				lt.title as moduleTitle, u.display_name as userName, d.name as deptName, 
+			DATE_FORMAT(l.create_time,'%Y-%m-%d') as createTime  from log l 
+				left join user u on l.user = u.id 
+				LEFT JOIN dept d on d.id = u.dept 
+				LEFT JOIN log_template lt on lt.id = l.template
+			where l.status = 1 
+					<if test="company != null">
+						and l.company = #{company} 
+					</if>
+			 
+					and u.id != #{currUser} 
+					<if test="targetUser != null">
+						and u.id = #{targetUser} 
+					</if>
+					<if test="dept != null">
+						and d.id = #{dept} 
+					</if>
+					<if test="isNoDept != null">
+						and d.id is null 
+					</if>
+					<if test="time != null">
+						and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time} 
+					</if>
+					<if test="startTime != null">
+						and l.create_time > #{startTime}
+						and l.create_time &lt; #{endTime}
+						
+					</if>
+
+				ORDER BY l.create_time DESC 
+	</select>
+	
+	<!-- 超级管理员查看 -->
+	<select id="logListDataByAdmin" resultType="java.util.HashMap">
+		SELECT l.id as id, u.display_name as userName, l.status as status,
+				c.short_name as companyName, d.name as deptName, l.title as title,
+				(select count(lr.id) from log_read lr where lr.log = l.id) as logReadNum,
+			(select count(ll.id) from log_like ll where ll.log = l.id) as logLikeNum,
+					unix_timestamp(l.create_time) as createTime   FROM log l 
+			LEFT JOIN user u on u.id = l.user
+			LEFT JOIN dept d on d.id = u.dept
+			LEFT JOIN company c on c.id = u.company
+		where l.status != 92
+			<if test="company != null">
+				and l.company = #{company}
+			</if>
+			<if test="time != null">
+				and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time}
+			</if>
+		order by l.create_time desc
+		limit #{page}, #{rows}
+		
+
+	</select>
+	<select id="countLogListDataByAdmin" resultType="java.lang.Integer">
+		SELECT count(l.id)   FROM log l 
+			LEFT JOIN user u on u.id = l.user
+			LEFT JOIN company c on c.id = u.company
+		where l.status != 92
+		<if test="company != null">
+				and l.company = #{company}
+		</if>
+		<if test="time != null">
+				and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time}
+		</if>
+	</select>
+	
+	
+	<select id="loadModuleById" resultType="QuanDiary.entity.Log">
+		select * from log 
+			where id = #{0} 
+			
+
+	</select>
+	<update id="delDiary" parameterType="QuanDiary.entity.Log">
+        update log  
+        <set>
+            <if test="status != null">status=#{status}</if>
+        </set>
+        where id = #{id}
+	</update>
+	<select id="logWritingSituation" resultType="java.util.HashMap">
+		select u.display_name as displayName, d.name as deptName,
+		(select count(l.id) from log l where l.user = u.id and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time} and l.status != 92) as logNum,
+		(select count(c.id) from card c where c.user = u.id and DATE_FORMAT(c.create_time,'%Y-%m-%d') = #{time}) as cardNum,
+		(select count(a.id) from approval a where a.user = u.id and DATE_FORMAT(a.create_time,'%Y-%m-%d') = #{time} and type = #{type}) as appNum
+ 	from user u	
+	LEFT JOIN dept d on d.id = u.dept
+
+	where u.company = #{companyId} and u.status != 92
+	limit #{page}, #{rows}
+	</select>
+	<update id="updateLogStatus" parameterType="QuanDiary.entity.Log">
+        update user
+        <set>
+        	<if test="status != status">status=#{status}</if>
+        </set>
+        where id=#{id}
+	</update>
+	<insert id="saveLogNotice" parameterType="QuanDiary.entity.LogNotice">
+		insert into log_notice(company,dept, user, status, create_time, title, content, type) 
+			values(#{company}, #{dept}, #{user}, #{status}, #{create_time}, #{title}, #{content}, #{type})
+	</insert>
+	<update id="delLogNotice" parameterType="QuanDiary.entity.LogNotice">
+        update log_notice
+        <set>
+        	<if test="status != null">status=#{status}</if>
+        </set>
+        where id=#{id}
+	</update>
+	<select id="loadLogNoticeById" parameterType="java.lang.Long" resultType="QuanDiary.entity.LogNotice">
+		select * from log_notice where id = #{0}
+	</select>
+	<select id="loadLogNotice" resultType="java.util.HashMap">
+		  
+		SELECT l.*, c.short_name companyName, 
+		(select d.name from dept d where l.dept = d.id) as deptName,
+		(select u.display_name from user u where l.user = u.id) as userName
+ FROM log_notice l
+	LEFT JOIN company c on l.company = c.id
+	where l.status != 92 
+	  	<if test="company != null and company != ''">  
+        	AND l.company = #{company}  
+        	<if test="user != null and user != ''">  
+	        	AND (l.type = 0 
+	        	<if test="dept != null and dept != ''"> 
+	        	or (l.type = 1 and l.dept = #{dept} )
+	        	</if>  
+	        	 or (l.type = 2 and l.user = #{user}))
+        	
+  			</if>  
+  		</if>  
+		
+	ORDER BY l.create_time desc
+	limit #{page}, #{rows}
+	</select>
+	<select id="loadLogNoticeCount" resultType="java.lang.Integer">
+	SELECT count(l.id)
+ FROM log_notice l
+	LEFT JOIN company c on l.company = c.id
+	where l.status != 92 
+	  	<if test="company != null and company != ''">  
+        	AND l.company = #{company}  
+        	<if test="user != null and user != ''">  
+	        	AND (l.type = 0 
+	        	<if test="dept != null and dept != ''"> 
+	        	or (l.type = 1 and l.dept = #{dept} )
+	        	</if>  
+	        	 or (l.type = 2 and l.user = #{user}))
+        	
+  			</if>  
+  		</if>  
+
+	</select>
+
+
+</mapper>

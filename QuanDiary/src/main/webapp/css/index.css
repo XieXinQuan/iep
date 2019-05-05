@@ -1,0 +1,171 @@
+		.floatLeft{
+			float:left;
+			height:600px;
+		}
+		#navigation{
+			border-radius:5px;
+			background-color:#A2B5CD;
+			width:100%;
+			height:50px;
+			margin-bottom:10px;
+			border-bottom:1px dashed #EED5D2;
+		}
+		#menu{
+			border-radius:5px;
+			background-color:#EBEBEB;
+			border-right:1px dashed #EED5D2;
+			width:10%;
+			margin-right:5px;
+		}
+		#show{
+
+			width:89%;
+		}
+		#tree{
+			background-color:#F7F7F7;
+			width:20%;
+			margin-right:5px;
+			border-right:1px dashed #EED5D2;
+		}
+		#content{
+
+			width:79%;
+		}
+		#navigationName{
+			width:10%;
+		}
+		.navigationFloatLeft{
+			float:left;
+			height:100%
+		}
+		#navigationMenu{
+			width:70%;
+		}
+
+		#menuUl li{
+			padding-left:3px;
+			margin-left:10px;
+			margin-bottom:5px;
+			list-style: none;
+		}
+		.menuContent{
+			margin:10px 10px auto 10px;
+			
+			height:30px;
+			width:36px;
+			
+		}
+		.menuContent img{
+			width:30px;
+			height:30px;
+		}
+		
+		.menuContent{
+			float:left;
+			margin-left:5px;
+		}
+		.menuContent span{
+			font-size:16px;
+			font-family:"黑体";
+		}
+		.secondMenuContent{
+			height:55px;
+			width:55px;
+			
+		}
+		.secondMenuContent img{
+			width:50px;
+			height:50px;
+		}
+		
+		.secondMenuContent{
+			float:left;
+			margin-left:5px;
+		}
+		.secondMenuContent span{
+			font-size:16px;
+			font-family:"黑体";
+		}
+	.addTdWidth{
+		width:150px;
+	}
+			
+		body {
+			font-family:"宋体";
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+        }
+        .handle{
+        	cursor:pointer;
+        }
+		.divChecked{
+			background-color :#CCCCCC;
+		}
+
+		#showWindow{
+			z-index:900;
+			position: absolute;
+
+			top:100px;
+			width:1200px;
+			height:500px;
+			background-color: #CCCCCC;
+			left: 50%; 
+			margin-left: -600px;
+		}
+		#blockWindow{
+			background-color: rgba(255,255,255,0.5);
+			position: absolute;
+			top:0px;
+			left:0px;
+
+			
+		}
+		.block{
+			width: 100%; 
+			height: 100%;
+			z-index: 800;
+			display: block; 
+		}
+		
+		#windowTop{
+			height:18px;
+			width:100%;
+			background-color:#C6E2FF;
+		}
+		#windowClose{
+			position: absolute;
+			right:5px;
+		}
+		.windowCenterLeft{
+			float: left;
+			height:477px;
+		}
+		#windowCenter{
+			height:477px;
+		}
+		#windowCenterLeft{
+			width:0.5%;
+			background-color:#C6E2FF;
+		}
+		#windowCenterContent{
+			overflow: auto;
+			width:98.9%;
+		}
+		#windowCenterRight{
+			width:0.5%;
+			background-color:#C6E2FF;
+		}
+		#windowBottom{
+			width:100%;
+			background-color:#C6E2FF;
+			height:5px;
+		}
+		.menuSelect{
+			color:#EEEE00;
+		}
+		.secondMenuSelect{
+			color:	#EE7600;
+		}

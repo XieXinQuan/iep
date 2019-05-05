@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.ApprovalDao">
+
+	<insert id="saveCard" parameterType="QuanDiary.entity.Card">
+		insert into card(company,user, status, create_time) 
+			values(#{company}, #{user}, #{status}, #{create_time})
+	</insert>
+	<insert id="saveApproval" parameterType="QuanDiary.entity.Approval">
+		insert into approval(company,user, status, create_time, start_time, end_time, reason,type) 
+			values(#{company}, #{user}, #{status}, #{create_time}, #{start_time}, #{end_time}, #{reason},#{type})
+	</insert>
+	<select id="viewApprovalById" resultType="QuanDiary.entity.Approval" parameterType="java.lang.Long">
+		select * from approval where id = #{0}
+	</select>
+	<select id="checkUserCard" resultType="java.lang.Integer">
+		select count(id) from card where user = #{0} 
+			and date_format(create_time, '%Y-%m-%d') = #{1}
+	</select>
+	<select id="loadCard" resultType="java.util.HashMap">
+		select u.display_name as displayName, d.name as deptName, UNIX_TIMESTAMP(c.create_time) as cardTime from user u 
+	LEFT JOIN dept d on d.id = u.dept
+	LEFT JOIN card c on c.user = u.id
+		where u.company = #{0} 
+			 and (c.create_time is null or date_format(c.create_time, '%Y-%m-%d') = #{1})
+	 GROUP BY u.id
+	ORDER BY c.create_time desc, u.id asc 
+	limit #{2}, #{3}
+	</select>
+	<select id="loadApproval" resultType="java.util.HashMap">
+		select a.id, u.display_name as displayName, d.name as deptName, a.type as type, a.reason as reason,
+			a.status aStatus, UNIX_TIMESTAMP(a.create_time) as appTime from approval a
+	LEFT JOIN user u on u.id = a.user
+	LEFT JOIN dept d on d.id = u.dept
+	where u.company = #{0}
+	and u.status != 92
+	and a.status != 92
+	order by a.create_time desc
+	limit #{1}, #{2}
+	</select>
+	<update id="updateApproval" parameterType="QuanDiary.entity.Approval">
+        update approval
+        <set>
+        	<if test="status != null">status=#{status}</if>
+
+        </set>
+        where id=#{id}
+	</update>
+	<select id="loadApprovalByTimer" resultType="java.lang.Long">
+		SELECT max(UNIX_TIMESTAMP(end_time)) FROM approval 
+ 			where type = #{type} and user = #{user} and status = #{status} 
+	</select>
+
+</mapper>

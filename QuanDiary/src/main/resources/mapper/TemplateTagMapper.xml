@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.TemplateTagDao">
+	<insert id="saveByBatch" parameterType="java.util.List" useGeneratedKeys="true">  
+    	insert into template_tag (template,title,type,content,status,order_no,creatr_time)  
+    	values   
+    	<foreach collection="list" item="item" index="index" separator="," >  
+        	(#{item.template},#{item.title},#{item.type},#{item.content},#{item.status},#{item.order_no},#{item.creatr_time})  
+    	</foreach>  
+    </insert> 
+	<select id="loadModuleById" resultType="QuanDiary.entity.TemplateTag">
+		select * from template_tag 
+			where template = #{0} 
+			and status = 1
+			order by order_no asc
+
+	</select>
+	
+</mapper>

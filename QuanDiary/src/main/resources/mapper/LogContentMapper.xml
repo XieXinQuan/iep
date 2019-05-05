@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.LogContentDao">
+
+	<insert id="save" parameterType="java.util.List" useGeneratedKeys="true">  
+    	insert into log_content (user,log,tag,content)  
+    	values   
+    	<foreach collection="list" item="item" index="index" separator="," >  
+    	
+        (#{item.user},#{item.log},#{item.tag},#{item.content})  
+    	</foreach>  
+    </insert> 
+    <select id="viewDiary" resultType="QuanDiary.entity.LogContent">
+    	select * from log_content where log = #{0}
+    </select>
+</mapper>

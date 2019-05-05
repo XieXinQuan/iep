@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>日志系统主页</title>
+<link href="../css/index.css" rel="stylesheet" rev="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="../js/jQuery1.7.js"></script>
+<!--<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="../js/jquery1.42.min.js"></script>
+<script type="text/javascript" src="../js/jquery.SuperSlide.js"></script>
+  <script type="text/javascript" src="../js/Validform_v5.3.2_min.js"></script> -->
+		
+	<script src="../ckeditor/ckeditor.js"></script>
+	
+
+		
+	<link rel="stylesheet" href="../zTree/css/demo.css" type="text/css">
+	<link rel="stylesheet" href="../zTree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+
+	<script type="text/javascript" src="../zTree/js/jquery.ztree.core-3.5.js"></script>
+	<script type="text/javascript" src="../zTree/js/jquery.ztree.excheck-3.5.js"></script>
+	
+	<!-- jqGrid组件基础样式包-必要 http://localhost:8080/QuanDiary/js/jquery-1.7.1.js-->
+	<link rel="stylesheet" href="../jqgrid/css/ui.jqgrid.css" />
+	
+	<!-- jqGrid主题包-非必要 --> 
+	<!-- 在jqgrid/css/css这个目录下还有其他的主题包，可以尝试更换看效果 -->
+	<link rel="stylesheet" href="../jqgrid/css/css/redmond/jquery-ui-1.8.16.custom.css" />
+
+	<!-- jquery插件包-必要 -->
+	<!-- 这个是所有jquery插件的基础，首先第一个引入 -->
+
+	
+	<!-- jqGrid插件包-必要 -->
+	<script type="text/javascript" src="../jqgrid/js/jquery.jqGrid.src.js"></script>
+	
+	<!-- jqGrid插件的多语言包-非必要 -->
+	<!-- 在jqgrid/js/i18n下还有其他的多语言包，可以尝试更换看效果 -->
+	<script type="text/javascript" src="../jqgrid/js/i18n/grid.locale-cn.js"></script>
+	
+	<script src="../jedate/jedate.js"></script>
+
+
+
+<script type="text/javascript">
+
+	var path = "http://";
+	$(function(){
+		path += window.location.host;
+		loadName();
+		setInterval("getTime();",1000);
+		$.ajax({
+			url:path+"/QuanDiary/index/loadMenu.do",
+			type:"post",
+			data:{},
+			dataType:"json",
+			success:function(result){
+				if (result.status == 1){
+					//var menus = "";
+					//alert(result.menus.length);
+					if (result.menus != null){
+						var firstMenuId ;
+						for (var i=0; i<result.menus.length; i++){
+							if(i==0) firstMenuId = result.menus[i].id;
+							var path = result.menus[i].path;
+							var title = result.menus[i].title;
+							var menus = "<div class='menuContent handle'><u>"+title+"</u></div>";
+							var $menus = $(menus);
+							var o = {"menu_id":result.menus[i].id};
+							$menus.data(o);
+							//将li元素添加到笔记本ul列表区
+							$("#navigationMenu").append($menus);
+						}
+						loadSecondMenu(firstMenuId);
+						//$("#navigationMenu").append(menus);
+					}
+				}
+			}
+		});
+		$(".menuContent").live("click", function() {
+			$('#navigationMenu').find('.menuContent').each(function(){
+				$(this).removeClass("menuSelect");
+			});
+			$(this).addClass("menuSelect");
+			//alert(1);
+			var menuId = $(this).data("menu_id");
+			//alert(menuId);
+			//console.log(menuId);
+			if (menuId != null) loadSecondMenu(menuId);
+			
+		});
+		$("#menuUl li").live("click", function() {
+			$('#menuUl').find('li').each(function(){
+				$(this).removeClass("secondMenuSelect");
+			});
+			$(this).addClass("secondMenuSelect");
+			//alert(1);
+			//alert($(this).data("urlPath"));
+			loadMenuShow($(this).data("urlPath"));
+		});
+
+	});
+	function loadName(){
+		$.ajax({
+			url:path+"/QuanDiary/index/loadName.do",
+			type:"post",
+			data:{},
+			dataType:"json",
+			success:function(result){
+				//console.log(result.ststus);
+				if (result.status == 0){
+					alert("请重新登录！");
+					setTimeout("window.location='../login/login1.html';", 500);
+				}
+				$("#nameSpan").html(result.name+"("+result.userType+")。");
+			}
+		});
+	}
+	function loadMenuShow(urlPath){
+		$.ajax({
+			url: path+"/QuanDiary"+urlPath,
+			type:"post",
+			success:function(result){
+				$("#show").html(result);
+			}
+		});
+
+	}
+	function loadSecondMenu(menu_id){
+		//alert(menu_id);
+		//console.log("......id:"+menu_id);
+		$.ajax({
+			url:path+"/QuanDiary/index/loadSecondMenu.do",
+			type:"post",
+			data:{"menu": menu_id},
+			dataType:"json",
+			success:function(result){
+				$("#menuUl").html("");
+				if (result.status == 1){
+					if (result.secondMenu != null){
+						for (var i=0; i<result.secondMenu.length; i++){
+							var path = result.secondMenu[i].path;
+							var title = result.secondMenu[i].title;
+							var urlPath = result.secondMenu[i].url_path;
+							var menus = "<li><u class='handle'>"+title+"</u></li>";
+							var $menus = $(menus);
+							var o = {"menu_id":result.secondMenu[i].id, "urlPath":urlPath};
+							$menus.data(o);
+							$("#menuUl").append($menus);
+						}
+
+					}
+				}
+			}
+		});
+	}
+	
+	function getTime(){
+		var myDate = new Date();
+		var year = myDate.getFullYear();
+		var month = myDate.getMonth()+1;
+		var day = myDate.getDate();
+		var hour = myDate.getHours();
+		var minutes = myDate.getMinutes();
+		var seconds = myDate.getSeconds();
+		$("#currTime").html(year+"-"+month+"-"+day+" "+hour+":"+minutes+":"+seconds); //将值赋给div
+	}
+	function closeWindow(){
+		var blockWindow = document.getElementById('blockWindow')
+		blockWindow.removeAttribute("class","block");
+		var showWindow = document.getElementById('showWindow');
+		showWindow.setAttribute("class","show");
+		$("#showWindow").hide();
+	}
+	function openWindow(title){
+		$("#windowTitle").text(title);
+		var blockWindow = document.getElementById('blockWindow');
+		blockWindow.setAttribute("class","block");
+		var showWindow = document.getElementById('showWindow');
+		showWindow.setAttribute("class","show");
+		$("#showWindow").show();
+	}
+	function openWindow(title, content){
+		$("#windowTitle").text(title);
+		$("#windowCenterContent").html(content);
+		var blockWindow = document.getElementById('blockWindow');
+		blockWindow.setAttribute("class","block");
+		var showWindow = document.getElementById('showWindow');
+		showWindow.setAttribute("class","show");
+		$("#showWindow").show();
+		
+	}
+	function openWindow(title, content){
+		$("#windowTitle").text(title);
+		$("#windowCenterContent").html(content);
+		var blockWindow = document.getElementById('blockWindow');
+		blockWindow.setAttribute("class","block");
+		var showWindow = document.getElementById('showWindow');
+		showWindow.setAttribute("class","show");
+		$("#showWindow").show();
+		//callBack();
+	}
+	
+	function closeWindow(){
+		var blockWindow = document.getElementById('blockWindow')
+		blockWindow.removeAttribute("class","block");
+		var showWindow = document.getElementById('showWindow');
+		showWindow.setAttribute("class","show");
+		$("#showWindow").hide();
+		//callBack();
+	}
+	function loginOut(){
+		if (confirm("您确定退出吗？")){
+			setTimeout("window.location='../login/login1.html';", 500);
+		}
+	}
+	Date.prototype.Format = function (fmt) { //author: meizz 
+	    var o = {
+	        "M+": this.getMonth() + 1, //月份 
+	        "d+": this.getDate(), //日 
+	        "h+": this.getHours(), //小时 
+	        "m+": this.getMinutes(), //分 
+	        "s+": this.getSeconds(), //秒 
+	        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+	        "S": this.getMilliseconds() //毫秒 
+	    };
+	    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+	    for (var k in o)
+	    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+	    return fmt;
+	}
+	function formatDate(cellvalue){
+		return new Date(cellvalue).Format("yyyy-MM-dd");
+	}
+	function formatTime(cellvalue){
+		return new Date(cellvalue).Format("yyyy-MM-dd hh:mm");
+	}
+	function f5Index(){
+		//alert(5);
+		location.reload();
+	}
+</script>
+</head>
+<body>
+	<div id="navigation">
+		<div id="navigationName" class="navigationFloatLeft">
+		<img src="../images/logIcon.png" alt="员工日志管理系统" class="handle" style="width:30px;height:30px;" onclick="f5Index()"/>
+			<b style="margin-top:5px;;font-size: 0.8em;">员工日志管理系统</b>
+		</div>
+		<div id="navigationMenu" class="navigationFloatLeft">
+			<!-- <div class="menuContent">
+				<img src="../images/karsaSmall.jpg"/><span>卡莎</span>
+			</div>
+			<div class="menuContent">
+				<img src="../images/akaliSmall.jpg"/><span>阿卡丽</span>
+			</div>  -->
+		</div>
+		<div id="navigationExit">
+			<span id="currTime"></span><br>
+			<span id="nameSpan">欢迎您，谢新权...</span>
+			<u class='handle' style="color: blue;" onmouseout="this.style.backgroundColor='';" onclick="loginOut();" onmouseover="this.style.backgroundColor='red';">退出登录</u>
+			
+		</div>
+		
+	</div>
+	<div id="menu" class="floatLeft" style="height:630px;">
+		<ul id="menuUl" style="padding-left: 15px;">
+		</ul>
+	</div>
+	<div id="show" class="floatLeft" style="height:630px;overflow:auto;">
+		
+		<b>欢迎使用员工日志管理系统！</b>
+		<img src="../images/index.jpg" alt="员工日志管理系统" style="width:100%;height:600px;;"/>
+		<!-- <div id="tree" class="floatLeft"></div>
+		<div id="content" class="floatLeft"></div> -->
+	</div>
+	<div id="blockWindow">
+		
+	</div>
+	<div id="showWindow" style="display:none;">
+		<div id="windowTop"><span id="windowTitle" style="margin-left:20px;">标题</span>
+		<img id="windowClose" src="../images/icon/exit.png" style="height:16px;width:16px;" class="handle" onclick="closeWindow();"/>
+</div>
+		<div id="windowCenter">
+			<div class="windowCenterLeft" id="windowCenterLeft"></div>
+			<div class="windowCenterLeft" id="windowCenterContent"></div>
+			<div class="windowCenterLeft" id="windowCenterRight"></div>
+		</div>
+		<div id="windowBottom"></div>
+	</div>
+	<iframe name="frame" frameborder="0" height="40"></iframe>
+
+	
+</body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.LogTemplateDao">
+	<select id="loadLogTemplateById" parameterType="java.lang.Long" resultType="QuanDiary.entity.LogTemplate">
+		select * from log_template 
+			where id = #{0}
+	</select>
+	<select id="loadModule" resultType="QuanDiary.entity.LogTemplate">
+		select * from log_template 
+			where company = #{0} 
+			and (status= #{1}
+				or status = #{2})
+			order by id desc 
+			limit #{3}, #{4}
+	</select>
+		<select id="loadModuleByCompany" resultType="QuanDiary.entity.LogTemplate">
+		select * from log_template 
+			where company = #{0} 
+			and status= #{1}
+
+	</select>
+	<select id="loadModuleById" resultType="QuanDiary.entity.LogTemplate">
+		select * from log_template 
+			where company = #{0} 
+			and status= #{1}
+
+	</select>
+	<select id="countByLoadModule" resultType="java.lang.Integer">
+		select count(id) from log_template 
+			where company = #{0} 
+			and (status = #{1}
+				or status = #{2}) 
+	</select>
+	<insert id="save" useGeneratedKeys="true" keyProperty="id"
+        parameterType="QuanDiary.entity.LogTemplate">
+	    INSERT INTO log_template (company, title, status) VALUES (#{company},#{title}, #{status})
+	</insert>
+	<update id="delLogModule" parameterType="QuanDiary.entity.LogTemplate">
+        update log_template
+        <set>
+            <if test="status != null">status=#{status}</if>
+        </set>
+        where id = #{id}
+	</update>
+</mapper>

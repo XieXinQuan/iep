@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>日志系统用户登录</title>
+
+<script type="text/javascript" src="../js/jQuery1.7.js"></script>
+<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="../js/jquery1.42.min.js"></script>
+<script type="text/javascript" src="../js/jquery.SuperSlide.js"></script>
+<script type="text/javascript" src="../js/Validform_v5.3.2_min.js"></script>
+<link href="../css/login.css" rel="stylesheet" rev="stylesheet" type="text/css" media="all" />
+<script type="text/javascript">
+$(document).ready(function(){
+	var $tab_li = $('#tab ul li');
+	$tab_li.hover(function(){
+		$(this).addClass('selected').siblings().removeClass('selected');
+		var index = $tab_li.index(this);
+		$('div.tab_box > div').eq(index).show().siblings().hide();
+	});	
+});
+$(function(){
+	var url = "http://";
+	url += window.location.host;
+	url += "/QuanDiary/user/login.do";
+	//alert(url);
+	document.getElementById("form").action= url;
+	//alert(window.location.host);
+});
+</script>
+<script type="text/javascript">
+$(function(){
+/*学生登录信息验证*/
+	$("#stu_username_hide").focus(function(){
+	 var username = $(this).val();
+	 if(username=='输入账号'){
+	 $(this).val('');
+	 }
+	});
+	$("#stu_username_hide").focusout(function(){
+	 var username = $(this).val();
+	 if(username==''){
+	 $(this).val('输入账号');
+	 }
+	});
+	$("#stu_password_hide").focus(function(){
+	 var username = $(this).val();
+	 if(username=='输入密码'){
+	 $(this).val('');
+	 }
+	});
+	$("#stu_password_hide").focusout(function(){
+	 var username = $(this).val();
+	 if(username==''){
+	 $(this).val('输入密码');
+	 }
+	});
+	$(".stu_login_error").Validform({
+		tiptype:function(msg,o,cssctl){
+			var objtip=$(".stu_error_box");
+			cssctl(objtip,o.type);
+			objtip.text(msg);
+		},
+		ajaxPost:true,
+		callback:function(data){
+			if (data.status == 1){
+				
+				setTimeout("window.location='../index/index.html';", 1000);
+			}else{
+				var objtip1=$(".stu_error_box");
+				objtip1.html("");
+				showMsg(data.msg);
+				setTimeout("hideMsg()", 3000);
+			}
+		}
+	});
+
+});
+</script>
+<script type="text/javascript">
+function showMsg(msg){
+	$("#showMsgContent").html("");
+	$("#showMsgContent").html("<font face='宋体' size='6' color='red'>"+msg+"</font>");
+	$("#floatdivids").show(1000);
+}
+function hideMsg(){
+	$("#floatdivids").hide(2000);
+}
+$(function(){
+	
+	$('#ClickRemoveFlo').click(function () {
+		$("#floatdivids").hide(500);
+	});
+	function onc(){
+		$("#floatdivids").hide(2000);
+		setTimeout("showMsg('哈哈')", 2000);
+	}
+
+	
+	$(".screenbg ul li").each(function(){
+		$(this).css("opacity","0");
+	});
+	$(".screenbg ul li:first").css("opacity","1");
+	var index = 0;
+	var t;
+	var li = $(".screenbg ul li");	
+	var number = li.size();
+	function change(index){
+		li.css("visibility","visible");
+		li.eq(index).siblings().animate({opacity:0},3000);
+		li.eq(index).animate({opacity:1},3000);
+	}
+	function show(){
+		index = index + 1;
+		if(index<=number-1){
+			change(index);
+		}else{
+			index = 0;
+			change(index);
+		}
+	}
+	t = setInterval(show,8000);
+	//根据窗口宽度生成图片宽度
+	var width = $(window).width();
+	$(".screenbg ul img").css("width",width+"px");
+});
+
+</script>
+</head>
+
+<body>
+
+<div id="tab">
+  <ul class="tab_menu" style="background-color: #000;">
+    <li style="margin-left: 50px;">日志系统用户登录</li>
+
+  </ul>
+  <div class="tab_box"> 
+    <!-- 学生登录开始 -->
+    <div>
+      <div class="stu_error_box"></div>
+      <form id="form" action="http://192.168.1.100:8080/QuanDiary/user/login.do" method="post" class="stu_login_error">
+        <div id="username">
+          <label>账&nbsp;&nbsp;&nbsp;号：</label>
+          <input type="text" id="stu_username_hide" name="loginName" value="输入账号" nullmsg="账号不能为空！" datatype="s4-18" errormsg="账号范围在6~18个字符之间！" sucmsg="账号验证通过！"/>
+          <!--ajaxurl="demo/valid.jsp"--> 
+        </div>
+        <div id="password">
+          <label>密&nbsp;&nbsp;&nbsp;码：</label>
+          <input type="password" id="stu_password_hide" name="password" value="输入密码" nullmsg="密码不能为空！" datatype="*6-16" errormsg="密码范围在6~16位之间！" sucmsg="密码验证通过！"/>
+        </div>
+       <!--  <div id="code">
+          <label>验证码：</label>
+          <input type="text" id="stu_code_hide" name="code"  value="输入验证码" nullmsg="验证码不能为空！" datatype="*4-4" errormsg="验证码有4位数！" sucmsg="验证码验证通过！"/>
+          <img src="../images/captcha.jpg" title="点击更换" alt="验证码占位图"/> </div> -->
+
+        <div id="login">
+          <button type="submit">登录</button>
+        </div>
+      </form>
+    </div>
+   <!-- 学生登录结束-->
+
+
+  </div>
+</div>
+
+<div class="screenbg">
+  <ul>
+    
+    <!-- <li><a href="javascript:;"><img src="../images/karsa.jpg"></a></li>  -->
+    <li><a href="javascript:;"><img src="../images/back.jpg"></a></li>
+  </ul>
+</div>
+<div id="floatdivids" style="display: none;">
+	<input id="ClickRemoveFlo" type="button" style="position: absolute;top: 0;right: 0;padding: 0 5px;cursor: pointer;" value="X">
+	<div id="showMsgContent"></div>
+</div>
+</body>
+</html>

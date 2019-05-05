@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.PersonalInformationDao">
+	<select id="loadPersonalInformation" resultType="QuanDiary.entity.PersonalInformation">
+		select * from personal_information where user = #{0} limit 0,1
+			
+	</select>
+	<insert id="save" parameterType="QuanDiary.entity.PersonalInformation">
+		insert into personal_information(user,company,status,user_type,sex,phone,adress,
+			city,democratic,age,height,weight,identity_card,hobby,introduce,email) 
+			values (#{user},#{company}, #{status}, #{user_type}, #{sex}, #{phone}, #{adress},
+			#{city},#{democratic},#{age},#{height},#{weight},#{identity_card},#{hobby},#{introduce},#{email})
+	</insert>
+	<update id="updatePersonInfor" parameterType="QuanDiary.entity.PersonalInformation">
+        update personal_information  
+        <set>
+            <if test="sex != null">sex=#{sex},</if>
+            <if test="phone != null">phone=#{phone},</if>
+            <if test="adress != null">adress=#{adress},</if>
+            <if test="city != null">city=#{city},</if>
+            <if test="democratic != null">democratic=#{democratic},</if>
+            <if test="age != null">age=#{age},</if>
+            <if test="height != null">height=#{height},</if>
+            <if test="weight != null">weight=#{weight},</if>
+            <if test="identity_card != null">identity_card=#{identity_card}</if>
+
+        </set>
+        where id = #{id}
+	</update>
+</mapper>

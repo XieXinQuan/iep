@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="QuanDiary.dao.IndexDao">
+	<select id="findMenu" parameterType="java.lang.String" resultType="java.lang.Long">
+		select id from menu where title = '#{title}'
+	</select>
+	<select id="loadMenu" parameterType="java.lang.Integer" resultType="QuanDiary.entity.Menu">
+		select * from menu where type = #{type} and status = 1
+	</select>
+	<select id="loadSecondMenu" resultType="QuanDiary.entity.SecondMenu">
+		select * from second_menu where menu = #{0} and type = #{1} and status = 1 order by order_no asc
+	</select>
+	<!--  <select id="login" parameterType="string" resultType="QuanDiary.entity.User">
+		select * from user where login_name = #{login_name}
+	</select>
+	<insert id="save" parameterType="QuanDiary.entity.User">
+		insert into user(company, login_name, display_name, password, status, user_type) 
+			values(#{company}, #{login_name}, #{display_name}, #{password}, #{status}, #{user_type})
+	</insert> -->
+</mapper>

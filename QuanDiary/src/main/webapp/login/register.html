@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>聊天室-注册</title>
+	<script src="../js/jquery-1.11.1.js"></script>
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">  
+	<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+	$(function(){
+		$("#cancel").click(function(){
+			window.location="login.html";
+			//makeNewWindow("login.html");
+			//window.open ("login.html", "新窗口", "height=100, width=400, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no")&nbsp;
+		});
+		
+		$("#register").click(function(){
+			var name = $("#loginName").val();
+			var password = $("#password").val();
+			var displayName = $("#displayName").val();
+			var affirm=$("#affirmPassword").val();
+			if(name==null || name.length == 0 || 
+					password==null || password.length == 0 ||
+					affirm==null || affirm.length == 0 ||
+					displayName==null || displayName.length == 0){
+				alert("请输入内容！");
+			}else if(password!=affirm){
+				alert("两次密码不一样！");
+			}else{
+				$.ajax({
+					url:"http://localhost:8080/QuanDiary/user/register.do",
+					type:"post",
+					data:{"loginName":name,"password":password,"displayName":displayName},
+					dataType:"json",
+					success:function(result){
+						if(result.status==0){
+							alert(result.msg);
+							window.location="login.html";
+						}else{
+							alert(result.msg);
+						}
+					},
+					error:function(){
+						alert("注册失败！");
+					}
+				});
+			}
+		});
+	});
+</script>
+</head>
+<body style="background-color:#A3A3A3;">
+	<div style="width:350px;height:220px;position: absolute;left:40%;top: 30%;background-color:#A3A3A3;">
+		<table>
+			<tr>
+				<td style="width:100px;">昵&nbsp&nbsp称：</td>
+				<td><input id="loginName" type="text" style="width:200px;height:32px;"></td>
+			</tr>
+			<tr>
+				<td>姓&nbsp&nbsp名：</td>
+				<td><input id="displayName" type="text" style="width:200px;height:32px;"></td>
+			</tr>
+			<tr>
+				<td>密&nbsp&nbsp码：</td>
+				<td><input id="password" type="password" style="width:200px;height:32px;"></td>
+			</tr>
+			<tr>
+				<td>确认密码：</td>
+				<td><input id="affirmPassword" type="password" style="width:200px;height:32px;"></td>
+			</tr>
+			<tr style="height:50px;">
+				<td><button type="button" class="btn btn-primary" style="height:100%" id="cancel">取&nbsp&nbsp消</button></td>
+				<td><button type="button" class="btn btn-success" style="height:100%" id="register">注&nbsp&nbsp册</button></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
