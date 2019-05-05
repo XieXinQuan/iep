@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis.apache-3-mapper.dtd">
+<mapper namespace="chat.dao.MessageDao">
+	<insert id="sendMessage" parameterType="chat.entity.Message">
+		insert into message(personal_id,friend_id,message,message_time) 
+		values(#{personal_id},#{friend_id},#{message},#{message_time})
+	</insert>
+	
+	
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis.apache-3-mapper.dtd">
+<mapper namespace="chat.dao.PersonalDao">
+	<insert id="save" parameterType="chat.entity.Personal">
+		insert into personal(personal_id,personal_name,personal_password) 
+		values(#{personal_id},#{personal_name},#{personal_password})
+	</insert>
+	
+	<select id="login" parameterType="String"  resultType="chat.entity.Personal">
+		select personal_password from personal where personal_name=#{personal_name}
+	</select>
+	
+	<select id="check" parameterType="String"  resultType="chat.entity.Personal">
+		select * from personal where personal_name=#{personal_name}
+	</select>
+	
+	<select id="loadFriend" parameterType="string" resultType="chat.entity.Friend">
+		select * from friend where personal_id=#{personal_id}
+	</select>
+	
+	<select id="name" parameterType="string" resultType="chat.entity.Personal">
+		select * from Personal where personal_id=#{personal_id}
+	</select>
+	
+	
+</mapper>

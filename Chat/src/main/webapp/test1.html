@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>聊天室-登录</title>
+	<script src="js/jquery-1.11.1.js"></script>
+	<script type="text/javascript" src="scripts/basevalue.js"></script>
+<script>
+	$(function(){
+	    document.getElementById('myInput').addEventListener('paste',function(e){
+	        if ( !(e.clipboardData && e.clipboardData.items) ) {
+	            return;
+	        }
+	        for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
+	            var item = e.clipboardData.items[i];
+
+	      //      if (item.kind === "string") {
+	       //         item.getAsString(function (str) {
+	      //              console.log(str);
+	      //          });
+	         //   } else 
+	            if (item.kind === "file") {
+	                var f= item.getAsFile();
+	                console.log(f);
+	            }
+	        }
+	    });
+	});
+
+</script>
+</head>
+<div id="test">
+	<textarea id="myInput" rows="20" cols="50" ></textarea>
+</div>
+</body>
+</html>

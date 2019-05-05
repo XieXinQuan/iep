@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>聊天室</title>
+<script src="js/jquery-1.11.1.js"></script>
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+ 
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+ 
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="styles/index.css">
+	<script type="text/javascript" src="scripts/basevalue.js"></script>
+	<script type="text/javascript" src="scripts/cookie.js"></script>
+	<script type="text/javascript" src="scripts/friend.js"></script>
+<script>
+	var websocket = null;
+	var personal_id = getCookie("personal_id");
+	var time = new Date();
+	
+	//判断当前浏览器是否支持WebSocket
+	if('WebSocket' in window){
+	    websocket = new WebSocket("ws://localhost:8080/Chat/websocket/"+personal_id);
+	}else{
+	    alert('Not support websocket');
+	}
+	
+	//连接发生错误的回调方法
+	websocket.onerror = function(){
+	    alert("error!");
+	};
+	
+	//连接成功建立的回调方法
+	websocket.onopen = function(event){
+	    //alert("open!");
+	}
+	
+	//接收到消息的回调方法
+	websocket.onmessage = function(event){
+	    message=event.data;
+	    var m = message.split("|");
+	    
+	    if(m[1]==0){	//0表示加好友请求
+	    	$(".confirm_addfriend").empty();
+	    	var add_friend = '';
+	    	add_friend+='<a href="#" class="list-group-item">'+m[2]+' 请求添加好友</a>';
+			var $add_friend=$(add_friend);
+			$add_friend.data("friend_id",m[0]);
+			$(".confirm_addfriend").append($add_friend);
+	    	$(".confirm_addfriend").show();
+	    }else if(m[1]==1){	//1表达拒绝加好友
+	    	
+	    	alert(m[2]+"拒绝加好友！");
+	    }else if(m[1]==2){	//2表示同意加好友
+	    	//此处应该优化加载好友...
+	    	alert(m[2]+"已同意！");
+	    	var friend_conversation='';
+			friend_conversation+='<li class="list-group-item"><span class="badge new">new</span>'+m[2]+'</li>';
+			//将sli字符串转换成jQuery对象li元素
+			var $friend_conversation=$(friend_conversation);
+			//将bookId值与jQuery对象绑定
+			var o = {"friend_id":m[0],"friend_name":m[2]};
+			$friend_conversation.data(o);
+			//将li元素添加到笔记本ul列表区
+			$("#friends_li").append($friend_conversation);
+	    }else if(m[1]==3){	//3表示接收信息
+	    	//alert(m[0]+"发来信息："+m[2]);
+	    	//load_con();
+	    	var list = $(".friends_conversation").find("li");
+	    	for(var i=0;i<list.length;i++){
+	    		if($(list[i]).data("friend_id")==m[0]){
+	    			var friend_name = $(list[i]).data("friend_name");
+	    			//alert(friend_name);
+	    			$(list[i]).remove();
+	    			var friend_conversation='';
+					friend_conversation+='<li class="list-group-item"><span class="badge">new</span>'+friend_name+'</li>';
+					//将sli字符串转换成jQuery对象li元素
+					var $friend_conversation=$(friend_conversation);
+					//将bookId值与jQuery对象绑定
+					var o = {"friend_id":m[0],"friend_name":friend_name};
+					$friend_conversation.data(o);
+					//将li元素添加到笔记本ul列表区
+					$("#friends_li").append($friend_conversation);
+					for(var j=0;j<list.length-1;j++){
+						var a = 'ul li:eq(0)';
+						$("#friends_li").append($(a));
+					}
+	    		}
+	    	}
+	    	$("#save_friendmessage").append(m[0]+"|1|"+m[2]+"%");
+	    	var fid = $("#save_friendid").val();
+	    	if(fid==m[0]){
+	    		$(".message").append('<p>'+m[2]+'</p>'); 
+	    	}
+	    }else if(m[0]==0){
+	    	alert(m[1]);
+	    }
+	    
+	}
+	
+	//连接关闭的回调方法
+	websocket.onclose = function(){
+		alert("服务器已关闭！");
+	}
+	
+	//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+	window.onbeforeunload = function(){
+		 websocket.close();
+	}
+	
+	//关闭连接
+	function closeWebSocket(){
+		/*var message =$("#save_friendmessage").html();
+		if(m!=null){
+			$.ajax({
+				url:path+"/message/send.do",
+				type:"post",
+				data:{"personal_id":personal_id,"message":message},
+				dataType:"json",
+				success:function(result){
+					//alert(friend_id);
+					//websocket.send(friend_id+"%3|"+message);
+				},
+				error:function(){
+					alert("保存失败!");
+				}
+			});
+		}*/
+	    websocket.close();
+		
+	}
+	
+	$(function(){
+		//登录成功加载好友
+		name();
+		load_con();
+		
+		
+		$("#add_friend").click(function(){
+			$(".chat").hide();
+			$(".add_friend").show();
+		});
+		
+		$("#search_result").on("click","a",function(){
+			if(confirm("想把对方加为好友吗?")){
+				var personal_name = $("#personal_name").html();
+				var friend_id = $(this).data("friend_id");
+				websocket.send(friend_id+"%0|"+personal_name);
+				
+			}
+			
+		});
+		
+		$(".confirm_addfriend").on("click","a",function(){
+			var friend_id = $(this).data("friend_id");
+			var personal_name = $("#personal_name").html();
+			if(confirm("是否同意?")){
+				//var personal_id = getCookie("personal_id");
+				$.ajax({
+					url:path+"/friend/agree.do",
+					type:"post",
+					data:{"personal_id":personal_id,"friend_id":friend_id},
+					dataType:"json",
+					success:function(result){
+						//var name = getCookie("personal_name");
+						websocket.send(friend_id+"%2|"+personal_name);	//2代表加好友
+						friend_name = result.data.friend_name;
+						var friend_conversation='';
+						friend_conversation+='<li class="list-group-item"><span class="badge new">new</span>'+friend_name+'</li>';
+						//将sli字符串转换成jQuery对象li元素
+						var $friend_conversation=$(friend_conversation);
+						//将bookId值与jQuery对象绑定
+						var o = {"friend_id":friend_id,"friend_name":friend_name};
+						$friend_conversation.data(o);
+						//将li元素添加到笔记本ul列表区
+						$("#friends_li").append($friend_conversation);
+						$(".confirm_addfriend").hide();
+						//window.location.reload();
+					},
+					error:function(){
+						alert("添加失败!");
+					}
+				});
+			}else{
+				//var friend_id = $(this).data("friend_id");
+				//var name = getCookie("personal_name");
+				websocket.send(friend_id+"%1|"+personal_name);	//1代表拒绝加好友
+				$(".confirm_addfriend").hide();
+			}
+		});
+		
+		$("#friends_li").on("click","li",function(){
+			//设置选中效果
+			$("#friends_li li").removeClass("active");
+			$(this).find(".badge").remove();
+			
+			$(this).addClass("active");
+			var a = $(this).data("friend_name");
+			var b = $(this).data("friend_id");
+			$("#save_friendid").val(b);
+			$("#friend_name").html(a);
+			
+			$(".message").empty();
+			var m = $("#save_friendmessage").html();
+			if(m!=null){
+				//alert(m);
+				var s = m.split("%");
+				for(var i=0;i<s.length;i++){
+					var msg = s[i].split("|");
+					if(msg[0]==b){
+						if(msg[1]==0){	//0代表自己的信息
+							$(".message").append('<p style="text-align:right;">'+msg[2]+'</p>'); 
+						}else if(msg[1]==1){
+							$(".message").append('<p>'+msg[2]+'</p>'); 
+						}
+					}
+				}
+			}
+			$(".add_friend").hide();
+			$(".chat").show();
+		});
+		$("#linkman_a").on("click","a",function(){
+			//设置选中效果
+			$("#linkman_a a").removeClass("active");
+			$(this).addClass("active");
+			$(".chat").show();
+		});
+		$("#friend_close").click(function(){
+			$(".chat").hide();
+		});
+		/*$("#input_message").keydown(function(event){
+	        var Code = event.keyCode;
+	        if (Code == 13){
+	        	var personal_message = $("#input_message").val();
+				$(".message").append('<p style="text-align:right;">'+personal_message+'</p>'); 
+				$("#input_message").val("");
+				$("#save_message_0").append(personal_message);
+	        }
+		});*/
+		$("#search").click(function(){
+			//var personal_id = getCookie("personal_id");
+			var search_name = $("#input_friend_name").val();
+			$("#input_friend_name").val("");
+			if(search_name==null){
+				alert("昵称不能为空！");
+			}else{
+				$("#search_result").empty();
+				$.ajax({
+					url:path+"/friend/search.do",
+					type:"post",
+					data:{"personal_id":personal_id,"search_name":search_name},
+					dataType:"json",
+					success:function(result){
+						if(result.status!=0){
+							alert(result.msg);
+						}else{
+							var name = result.data.personal_name;
+							var friend_id=result.data.personal_id;
+							var search_name='';
+							search_name+='<a href="#" class="list-group-item">'+name+'</a>';
+							var $search_name=$(search_name);
+							var o = {"friend_id":friend_id,"friend_name":friend_name}
+							$search_name.data(o);
+							$("#search_result").append($search_name);
+						}
+					},
+					error:function(){
+						alert("查找失败！");
+					}
+				});
+			}
+		});
+		$("#send").click(function(){
+			var friend_id = $("#save_friendid").val();
+			//var personal_id = getCookie("personal_id");
+			var message = $("#input_message").val();
+			if(message!=null){
+				$(".message").append('<p style="text-align:right;">'+message+'</p>'); 
+				websocket.send(friend_id+"%3|"+message);
+				var friend_name = $("#friend_name").val();
+				$("#input_message").val("");
+				$("#save_friendmessage").append(friend_id+"|0|"+message+"|"+time.getTime()+"%");
+				/*$.ajax({
+					url:path+"/message/send.do",
+					type:"post",
+					data:{"personal_id":personal_id,"friend_id":friend_id,"message":message},
+					dataType:"json",
+					success:function(result){
+						//alert(friend_id);
+						websocket.send(friend_id+"%3|"+message);
+					},
+					error:function(){
+						alert("发送失败!");
+					}
+				});*/
+			}else{
+				alert("信息内容不能为空!");
+			}
+		});
+		$("#logout").click(function(){
+			window.location="login.html";
+		});
+		$("#conversation").click(function(){
+			$("#conversation_span").text("会 话");
+			$(".friends_linkman").hide();
+			$(".friends_set").hide();
+			$(".friends_conversation").show();
+		});
+		$("#linkman").click(function(){
+			$("#conversation_span").text("联系人");
+			$(".friends_set").hide();
+			$(".friends_conversation").hide();
+			$(".friends_linkman").show();
+		});
+		$("#set").click(function(){
+			$("#conversation_span").text("设 置");
+			$(".friends_linkman").hide();
+			$(".friends_conversation").hide();
+			$(".friends_set").show();
+		});
+	});
+</script>
+</head>
+<body>
+	<div class="menu">
+		<div class="personal">
+			<img src="img/2.jpg" class="img-circle" alt="Cinque Terre" width="98" height="98"><span id="personal_name"></span>
+		</div>
+		<div class="conversation">
+			<span id="conversation_span">会&nbsp话</span>
+		</div>
+		<div class="friends">
+			<div class="friends_conversation" style="width:100%;height:100%;">
+				<ul class="list-group" id="friends_li">
+					<!-- 动态拼接<li> -->
+				</ul>
+			</div>
+			<div class="friends_linkman" style="width:100%;height:100%;display:none;">
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title" style="height:30px;text-align:center;font-size:1.5em;">
+								<a data-toggle="collapse" data-parent="#accordion" 
+								   href="#linkman_a">
+									朋友  <1/1>
+								</a>
+							</h4>
+						</div>
+						<div id="linkman_a" class="panel-collapse collapse">
+							<a href="#" class="list-group-item">Huan</a>
+						</div>
+					</div>
+				</div>
+				<div id="add_friend" style="width:20px;height:20px;position:absolute;right:25px;bottom:80px;">
+					<button type="button" class="btn btn-primary btn-lg">+</button>
+				</div>
+			</div>
+			<div class="friends_set" style="width:100%;height:100%;display:none;">
+				<button type="button" class="btn btn-danger" id="logout" style="width:100%;height:60px;font-size:1.5em;position: absolute;bottom:50px;">注&nbsp&nbsp销</button>
+			</div>
+		</div>
+		<div class="classify">
+			<div class="classify_conversation">
+				<button type="button" class="btn" id="conversation" style="width:100%;height:100%;font-size:30px;background-color:black;color:white;">会 话</button>
+			</div>
+			<div class="classify_linkman">
+				<button type="button" class="btn" id="linkman" style="width:100%;height:100%;font-size:28px;background-color:black;color:white;">联系人</button>
+			</div>
+			<div class="classify_set">
+				<button type="button" class="btn" id="set" style="width:100%;height:100%;font-size:30px;background-color:black;color:white;">设 置</button>
+			</div>
+		</div>
+	</div>
+	
+	<div class="chat" style="display: none;">
+		<div class="friend">
+			<span id="friend_name"></span><button type="button" class="btn btn-danger" id="friend_close" style="float:right;position: relative;top: 12px;right:10px;">关闭</button>
+		</div>
+		<div class="message">
+			<!-- 动态生成 -->
+		</div>
+		<div class="send">
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="请输入内容..." id="input_message">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="button" id="send">
+								发送
+							</button>
+						</span>
+			</div>
+		</div>
+	</div>
+	<div class="add_friend" style="width:300px;height:600px;position:fixed;left:780px;top:200px;background-color:#EEE5DE;display:none;">
+		<div class="input-group" style="width:100%;height:36px;float:left;">
+			<input type="text" class="form-control" placeholder="请输入昵称..." id="input_friend_name">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="button" id="search">
+								查找
+						</button>
+					</span>
+		</div>
+		<div id="search_result" class="search_friends" style="width:100%;height:564px;float:left;overflow:auto;">
+			<!-- 动态生成 -->
+		</div>
+	</div>
+	<div class="confirm_addfriend" style="width:600px;height:40px;position:absolute;right:30%;top:10px;background-color:#EEE5DE;display:none;text-align:center;">
+		<!-- 动态生成 -->
+	</div>
+	<div class="data" style="width:10px;height:10px;position:absolute;left:1px;top:1px;overflow:auto;background-color:#EEE5DE;display:none;">
+		<span id="save_friendid"></span>
+	</div>
+	<div class="data1" style="width:300px;height:200px;position:absolute;left:50px;top:300px;overflow:auto;background-color:#EEE5DE;display:none;">
+		<span id="save_friendmessage"></span>
+	</div>
+</body>
+</html>

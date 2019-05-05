@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis.apache-3-mapper.dtd">
+<mapper namespace="chat.dao.FriendDao">
+
+	<insert id="addFriend" parameterType="chat.entity.Friend">
+		insert into friend(personal_id,friend_id,friend_name,friend_group) 
+		values(#{personal_id},#{friend_id},#{friend_name},#{friend_group})
+	</insert>
+	
+	<select id="loadFriend" parameterType="string" resultType="chat.entity.Friend">
+		select * from friend where personal_id=#{personal_id}
+	</select>
+	
+	<select id="search" resultType="chat.entity.Personal">
+		select * from personal where personal_name=#{search_name}
+	</select>
+	
+	
+</mapper>

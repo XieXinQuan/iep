@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>聊天室-登录</title>
+	<script src="js/jquery-1.11.1.js"></script>
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">  
+	<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="scripts/basevalue.js"></script>
+	<script type="text/javascript" src="scripts/cookie.js"></script>
+<script>
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var ext = img.src.substring(img.src.lastIndexOf(".")+1).toLowerCase();
+    var dataURL = canvas.toDataURL("image/"+ext);
+    canvas = null;
+    return dataURL;
+}
+$(function(){
+	var o = $('#test');
+	var imgUrl = $("#img").attr("src");
+	var tempImage = new Image();
+//	tempImage.crossOrigin = 'anonymous';
+	//tempImage.src = "img/clip_image004.jpg";
+	//var imgUrl = 'file:///D:\\img\\1.png';
+//	var imgUrl = 'img\\1.jpg';
+	console.log(imgUrl);
+	//tempImage.src = "D:\img\1.png";
+	//imgUrl = imgUrl;
+	tempImage.src = imgUrl;
+	console.log(tempImage.src);
+	tempImage.onload = function(){
+	    var baseSrc = getBase64Image(tempImage);
+	    var pHtml = "<img src="+baseSrc+" onclick='a(this);' />";
+	    o.html(pHtml);
+	}
+});
+function a(img){
+	console.log(img.src);
+}
+
+
+</script>
+</head>
+<div id="test"></div>
+<img src="file:///c:\Users\ADMINI~1\AppData\Local\Temp\msohtmlclip1\01\clip_image004.jpg" style="height:521px; width:304px" />
+<img id="img" src="file:///C:\Users\ADMINI~1\AppData\Local\Temp\msohtmlclip1\01\clip_image004.jpg" style="height:527px; width:307px" />
+<img src="img/2.jpg">
+</body>
+</html>
