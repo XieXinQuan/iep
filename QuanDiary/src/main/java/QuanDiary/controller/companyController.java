@@ -1,16 +1,11 @@
 package QuanDiary.controller;
 
-import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -21,14 +16,12 @@ import net.sf.json.JSONObject;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import QuanDiary.Util.enumUtil.CommonStatus;
 import QuanDiary.Util.enumUtil.UserStatus;
 import QuanDiary.Util.enumUtil.UserType;
 import QuanDiary.Util.md5Util.Md5;
-import QuanDiary.Util.toolUtil.TranscodingUtil;
 import QuanDiary.dao.ApprovalDao;
 import QuanDiary.dao.DeptDao;
 import QuanDiary.dao.PersonalInformationDao;
