@@ -28,9 +28,9 @@
 	</insert>
 	
 	<select id="loadLogComment" resultType="java.util.HashMap">
-		select u.login_name as loginName, c.content as content ,u.display_name as displayName, unix_timestamp(c.create_time) as createTime
+		select c.id, u.login_name as loginName, c.content as content ,u.display_name as displayName, unix_timestamp(c.create_time) as createTime
 			 from comment c left join user u on u.id = c.user
-			where c.log = #{0} order by c.create_time desc
+			where c.log = #{0} and c.status = 1 order by c.create_time desc
 			
 	</select>
 	
@@ -49,7 +49,17 @@
 		limit #{page}, #{rows}
 	
 	</select>
-	
+	<update id="updateCommentStatus" parameterType="QuanDiary.entity.Comment">
+        update comment
+        <set>
+        	<if test="status != null">status=#{status}</if>
+        </set>
+        where id=#{id}
+	</update>
+	<select id="loadCommentById" resultType="QuanDiary.entity.Comment" parameterType="java.lang.Long">
+		select * from comment where id = #{0}
+			
+	</select>
 	<insert id="saveLogLike" parameterType="QuanDiary.entity.LogLike">
 		insert into log_like(user,log,status,create_time) 
 			values (#{user}, #{log},  #{status}, #{create_time})

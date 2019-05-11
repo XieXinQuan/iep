@@ -6,9 +6,10 @@
 
 		<script type="text/javascript">
 			var id = ${id };
+			var userType = ${userType };
 			var title = "${title }";
 			var author = "${userName }";
-
+			
 			$(function(){
 
 				$("#diaryAuthorName").text(author);
@@ -46,15 +47,35 @@
 						var commentsHtml = "";
 						for(var i=0;i<comments.length;i++){
 							//console.log(likes[i].createTime);
+							commentsHtml += "<div id='comment"+comments[i].id+"'>";
 							commentsHtml += comments[i].displayName + " ： " + comments[i].content;
-							
-							commentsHtml += "<span style='float:right;'>"+formatTime(comments[i].createTime*1000)+"</span><br>";
+							if(userType == 3 || userType == 4){
+								commentsHtml += "<img src='../images/icon/exit.png' style='height:16px;width:16px;' class='handle' onclick='delComment("+comments[i].id+");'/>";
+							}
+							commentsHtml += "<span style='float:right;'>"+formatTime(comments[i].createTime*1000)+"</span></div>";
 							//alert(comments[i].displayName);
 							//commentsHtml += comments[i].displayName + "在" +formatTime(comments[i].createTime*1000)+"发表了评论："+comments[i].content+"。<br>";
 						}
 						$("#loadLogComment").append(commentsHtml);
 					}
 				});
+			}
+			function delComment(id){
+				if (confirm("您确定要删除此条评论吗？")){
+					$.ajax({
+						url:path+"/QuanDiary/log/delComment.do",
+						type:"post",
+						data:{"id":id},
+						dataType:"json",
+						success:function(result){
+							if(result.status == 1){
+								$("#comment"+id).html("");
+							}
+							alert(result.msg);
+						}
+					});
+				}
+
 			}
 			function sumbitCommentContent(){
 				

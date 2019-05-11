@@ -55,6 +55,8 @@
 					data:{},
 					dataType:"json",
 					success:function(result){
+						var timeArray = new Array();
+						var dateArray = new Array();
 						if(result.status == 1){
 							//$("#editor").show();
 							
@@ -88,23 +90,55 @@
 									var num = "value=value.replace(/[^\\d]/g,'')";
 									html += "<b>"+content.title+"：</b><input type='text' id='field"+i+"' oninput = \""+num+"\"><br>";
 								}else if(content.type == 4){
+									timeArray[timeArray.length] = "field"+i;
 									html += "<b>"+content.title+"：</b>";
-									html += "<input type='datetime-local' id='field"+i+"'><br>";
+									html += "<input class='datainp' id='field"+i+"' type='text' value='' readonly><br>";
 								}else if(content.type == 5){
+									dateArray[dateArray.length] = "field"+i;
 									html += "<b>"+content.title+"：</b>";
-									html += "<input type='date' id='field"+i+"'><br>";
+									html += "<input class='datainp' id='field"+i+"' type='text' readonly><br>";
 								}else if(content.type == 6){
 									
 								}
 								
 							}
 							html += "<br>";
+							
 							$("#loadModuleContent").html(html);
+							for(var i = 0; i<timeArray.length;i++){
+							    jeDate({
+									dateCell:"#"+timeArray[i],
+									format:"YYYY-MM-DD hh:mm",
+									isinitVal:true,
+									isTime:true //isClear:false,
+									//minDate:"2014-09-19 00:00:00",
+									//okfun:function(val){alert(val)}
+								});
+							}
+							for(var i = 0; i<dateArray.length;i++){
+							    jeDate({
+									dateCell:"#"+dateArray[i],
+									format:"YYYY-MM-DD hh:mm",
+									isinitVal:true,
+									isTime:false //isClear:false,
+									//minDate:"2014-09-19 00:00:00",
+									//okfun:function(val){alert(val)}
+								});
+							}
+							
 						}else {
 							$("#loadModuleContent").html("系统错误！");
 						}
 						
 					}
+				});
+			    jeDate({
+					dateCell:"#searchListSearchEndTime",
+					format:"YYYY-MM-DD",
+					//isinitVal:true,
+					isTime:false //isClear:false,
+					//minDate:"2014-09-19 00:00:00",
+					//okfun:function(val){alert(val)}
 				});
 			}
 			function sumbitDiary(){

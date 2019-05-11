@@ -239,6 +239,27 @@
 		//alert(5);
 		location.reload();
 	}
+	function getWeekFirstDay(){     
+	    var Nowdate=new Date();     
+	    var WeekFirstDay=new Date(Nowdate-(Nowdate.getDay()-1)*86400000);     
+	    var M=Number(WeekFirstDay.getMonth())+1;
+	    var fm = ""+M;
+	    if(M < 10) fm = "0"+M;
+	    var fd = WeekFirstDay.getDate();
+	    if(fd < 10) fd = "0"+WeekFirstDay.getDate();
+	    return WeekFirstDay.getFullYear()+"-"+fm+"-"+fd;     
+	}
+	function getWeekLastDay(){     
+	    var Nowdate=new Date();     
+	    var WeekFirstDay=new Date(Nowdate-(Nowdate.getDay()-1)*86400000);     
+	    var WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
+	    var M = Number(WeekLastDay.getMonth())+1;
+	    var fm = ""+M;
+	    if(M < 10) fm = "0"+M;
+	    var fd = WeekLastDay.getDate();
+	    if(fd < 10) fd = "0"+WeekLastDay.getDate();
+	    return WeekLastDay.getFullYear()+"-"+fm+"-"+fd;     
+	}
 </script>
 </head>
 <body>

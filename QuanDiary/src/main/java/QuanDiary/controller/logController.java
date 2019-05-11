@@ -63,6 +63,10 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
+
+
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -510,8 +514,9 @@ public class logController {
 	}
 	@RequestMapping("/loadOtherUserLogList.do")
 	@ResponseBody
-	public void loadOtherUserLogList(HttpServletRequest request,HttpServletResponse response){
+	public void loadOtherUserLogList(Integer type, HttpServletRequest request,HttpServletResponse response){
 		try{
+			request.setAttribute("type", type==null?0:type);
 			if(request.getSession().getAttribute("userId") != null){
 				Long userId = Long.parseLong(request.getSession().getAttribute("userId").toString());
 				request.setAttribute("userType", userDao.userType(userId));
@@ -641,6 +646,12 @@ public class logController {
 				wb = logService.getHSSFWorkbook(wb, moduleId, moduleName.get(moduleId), 
 						logIdByModuleIds.get(moduleId), userNameByLogId);
 				
+			}
+			if(wb == null){
+				wb = new HSSFWorkbook();
+				HSSFSheet sheet = wb.createSheet("无数据");
+				HSSFRow row = sheet.createRow(0);
+				row.createCell(0).setCellValue("无数据");
 			}
 			try {
 		        String filename = "导出日志.xls";  
@@ -796,8 +807,10 @@ public class logController {
 	public void viewDiary(HttpServletRequest request,HttpServletResponse response,
 			Long id){
 		try{
+
 			request.setAttribute("id", id);
 			Log log = logService.loadModuleById(id);
+			
 			request.setAttribute("title", log.getTitle());
 			request.setAttribute("createTime", log.getCreate_time());
 			request.setAttribute("userName", userService.loadName(log.getUser()));
@@ -812,6 +825,12 @@ public class logController {
 	public void viewDiaryComment(HttpServletRequest request,HttpServletResponse response,
 			Long id){
 		try{
+			if(request.getSession().getAttribute("userId") != null){
+				Long userId = Long.parseLong(request.getSession().getAttribute("userId").toString());
+				request.setAttribute("userType", userDao.userType(userId));
+			}
+			
+			
 			request.setAttribute("id", id);
 			Log log = logService.loadModuleById(id);
 			request.setAttribute("title", log.getTitle());
@@ -891,6 +910,24 @@ public class logController {
 		result.put("reads", reads);
 		List<HashMap<String, Object>> comments = logLikeDao.loadLogComment(id);
 		result.put("comments", comments);
+		return result;
+	}
+	@RequestMapping("/delComment.do")
+	@ResponseBody
+	public HashMap<String, Object> delComment(HttpServletRequest request,HttpServletResponse response,
+			Long id){
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put("msg", "操作失败！");
+		result.put("msg", 2);
+		result.put("status", CommonStatus.Normal.getValue());
+		if(id != null){
+			Comment comment = logLikeDao.loadCommentById(id);
+			comment.setStatus(CommonStatus.Delete.getValue());
+			logLikeDao.updateCommentStatus(comment);
+			result.put("msg", "删除成功！");
+			result.put("status", CommonStatus.Normal.getValue());
+		}
+		
 		return result;
 	}
 	@RequestMapping("/sumbitDiaryCommentContent.do")

@@ -76,12 +76,7 @@ public class companyController {
 					dept.setCreate_time(new Timestamp(System.currentTimeMillis()));
 					dept.setName(deptName);
 					dept.setStatus(CommonStatus.Normal.getValue());
-					if(deptId != null){
-						if(deptId != 0){
-							dept.setParent(-deptId);
-						}
-						
-					}
+					if(deptId != null && deptId != 0) dept.setParent(-deptId);
 					deptDao.save(dept);
 					result.put("status", CommonStatus.Normal.getValue());
 					result.put("msg", "保存成功！");

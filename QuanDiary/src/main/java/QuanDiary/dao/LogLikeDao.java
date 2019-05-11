@@ -19,7 +19,7 @@ public interface LogLikeDao {
 	public Integer checkLogRead(Long log, Long user);
 
 
-	
+	public Comment loadCommentById(Long id);
 	public List<HashMap<String, Object>> loadLogLike(Long logId);
 	public List<HashMap<String, Object>> loadLogRead(Long logId);
 	
@@ -29,5 +29,5 @@ public interface LogLikeDao {
 	public List<HashMap<String, Object>> logStatistical(@Param("createTime") String createTime, 
 			@Param("companyId") Long companyId, @Param("page") Integer page,
 			@Param("rows") Integer rows);
-	
+	public void updateCommentStatus(Comment comment);
 }

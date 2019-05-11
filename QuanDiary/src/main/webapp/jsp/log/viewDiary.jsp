@@ -6,6 +6,7 @@
 
 		<script type="text/javascript">
 			var id = ${id };
+			
 			var title = "${title }";
 			var author = "${userName }";
 			$(function(){

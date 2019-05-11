@@ -12,6 +12,8 @@
 		<!-- 本页面初始化用到的js包，创建jqGrid的代码就在里面 
 		<script type="text/javascript" src="../../js/index.js"></script>-->
 		<script type="text/javascript">
+		
+		
 		var selectDeptId = 0;
 		var zTree;
 		var setting = {
@@ -47,7 +49,9 @@
 			        	selectDeptId = treeNode.id;
 			        	$("#selectOtherUserName").val(treeNode.name);
 			        	$("#showTree").css({"visibility" : "hidden"});
-			        	var data;
+
+			        	var data = {"id":treeNode.id};
+			        	/*
 			        	if($("#cradListSearchTime").val() != null && $("#cradListSearchTime").val() != ""){
 			        		data = {"id":treeNode.id, "time":$("#cradListSearchTime").val()};
 			        	}else{
@@ -55,7 +59,7 @@
 			        	}
 			        	
 			        	$("#cradListSearchTime").val();
-			        	
+			        	*/
 			            $("#list2").jqGrid('setGridParam',{
 			                datatype:'json',
 			                postData:data, //发送数据
@@ -69,12 +73,15 @@
 			var zNodes ;
 			$.fn.zTree.init($("#selectDeptTree"), setting, zNodes);	
 		});
+		var listType = ${type};
 		var userType = ${userType };
 		
 		$(function(){
+			if(listType != 0) {
+				$("#otherUserDiaryQueryDate").hide();
+				$("#otherUserDiaryQueryTime").hide();
+			}
 			
-			//页面加载完成之后执行
-			//alert("${userId }");
 			pageInit();
 		});
 		function pageInit(){
@@ -115,18 +122,26 @@
                 	 formatter: logListOpt }
                ];
 			}
-			
-			
+			var url;
+			if(listType == 0){
+				
+				url = path+"/QuanDiary/log/loadOtherUserLogListData.do";
+			}else if(listType == 1){
+				url = path+"/QuanDiary/log/loadOtherUserLogListData.do?time="+formatDate(new Date().getTime());
+			}else if(listType == 2){
+				var urlAppend = "?startTime="+getWeekFirstDay()+" 00:00&endTime="+getWeekLastDay()+" 23:59";
+				url = path+"/QuanDiary/log/loadOtherUserLogListData.do"+urlAppend;
+			}
 			jQuery("#list2").jqGrid(
 					{
-		    	        url : path+'/QuanDiary/log/loadOtherUserLogListData.do',
+		    	        url : url,
 		    	        datatype : "json",
 		    	        colNames : colNames,
 		    	        colModel : colModel,
 		    	        rowNum : 20,
 		    	        autowidth:true,
 		    	        rownumbers: true,
-		    	        height:'500px',
+		    	        height: '500px',
 		    	        rowList : [ 10, 20, 50, 100],
 		    	        //multiselect: true,
 		    	        pager : '#pager2',
@@ -143,8 +158,10 @@
 		function logListOpt(value, grid, rows, state) { 
 			var html = "";
 			if(userType == 2 || userType == 3){
-				html += "<button class='handle' onclick='show("+rows.id+")'>查看</button>&nbsp;";
-				html += "<button class='handle' onclick='diaryLike("+rows.id+")'>点赞</button>&nbsp;";
+				html += "<img src='../images/viewDiary.png' style='height:21px;width:38px;' class='handle' onclick='show("+rows.id+")'/>&nbsp;";
+				//html += "<button class='handle' onclick='show("+rows.id+")'>查看</button>&nbsp;";
+				html += "<img src='../images/diaryLike.png' style='height:21px;width:38px;' class='handle' onclick='diaryLike("+rows.id+")'/>&nbsp;";
+				//html += "<button class='handle' onclick='diaryLike("+rows.id+")'>点赞</button>&nbsp;";
 				html += "<button class='handle' onclick='diaryComment("+rows.id+")'>互动</button>&nbsp;";
 			}
 			if(userType == 3){
@@ -293,11 +310,10 @@
 		    }
 		}
 		function cradListSearchTime(){
-			var time = $("#cradListSearchTime").val();
-			if(time == "") time = "";
             $("#list2").jqGrid('setGridParam',{
                 datatype:'json',
-                postData:{"time":time, "id":selectDeptId}, //发送数据
+                //postData:{"time":time, "id":selectDeptId}, //发送数据
+                postData:{"id":selectDeptId, "time":$("#cradListSearchTime").val()}, //发送数据
                 page:1
             }).trigger("reloadGrid");
 		}
@@ -361,12 +377,19 @@
 	    	var startTime = $("#searchListSearchStartTime").val();
 	    	var endTime = $("#searchListSearchEndTime").val();
 	    	var time = $("#cradListSearchTime").val();
-			if(time == "") time = "";
+			
+			if(listType == 1) time = formatDate(new Date().getTime());
+			//console.log(formatDate(new Date().getTime()));
 			var url = path + "/QuanDiary/log/diaryExportExcel.do?time="+time+"&id="+selectDeptId;
-	    	if(startTime != "") path += "&startTime="+startTime+" 00:00";
-	    	if(endTime != "") path += "&endTime="+startTime+" 23:59";
-	    	
-	    	
+
+			if(listType == 0){
+				if(startTime != "") url += "&startTime="+startTime+" 00:00";
+		    	if(endTime != "") url += "&endTime="+endTime+" 23:59";
+			}else if(listType == 2){
+				url += "&startTime="+getWeekFirstDay()+" 00:00";
+				url += "&endTime="+getWeekLastDay()+" 23:59";
+			}
+
 			document.getElementById("diaryExport").action= url;
 	    	var form = document.getElementById('diaryExport');
 	    	//再次修改input内容
@@ -377,13 +400,15 @@
 	</head>
 	<body>
 		<div id="otherUserDiaryQuery" style="height:30px;background-color: #D1EEEE;" >
-			请选择查询日期：<input type="date" id="cradListSearchTime" onchange="cradListSearchTime();">
+			
+			<span id="otherUserDiaryQueryDate">请选择查询日期：<input type="date" id="cradListSearchTime" onchange="cradListSearchTime();"></span>
 			&nbsp;请选择人员：<input id="selectOtherUserName" type="text" readonly="readonly"><input class='handle' type="button" value="选择" onclick="showSelectUserTree(event);">
+			<span id="otherUserDiaryQueryTime">
 			&nbsp;指定时间：<input class="datainp" id="searchListSearchStartTime" type="text" value="" readonly>
 			-
 			<input class="datainp" id="searchListSearchEndTime" type="text" value="" readonly>
 			<input class="handle" value="确定" onclick="searchDiaryByTime();" type="button">
-			
+			</span>
 			<form id="diaryExport" action="http://localhost:8080/QuanDiary/log/diaryExport.do"
 	        	method="post" style="float:right;">
 	        	<input class="handle" value="导出" type="button" onclick="sumbitDiaryExport();">
