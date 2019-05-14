@@ -19,13 +19,19 @@
 			and date_format(create_time, '%Y-%m-%d') = #{1}
 	</select>
 	<select id="loadCard" resultType="java.util.HashMap">
-		select u.display_name as displayName, d.name as deptName, UNIX_TIMESTAMP(c.create_time) as cardTime from user u 
+	
+	
+	
+		select u.display_name as displayName, d.name as deptName
+		,(SELECT c.create_time from card c where u.id = c.user and (date_format(c.create_time, '%Y-%m-%d') = #{0} )) as cardTime
+
+		 from user u 
 	LEFT JOIN dept d on d.id = u.dept
 	LEFT JOIN card c on c.user = u.id
-		where u.company = #{0} 
-			 and (c.create_time is null or date_format(c.create_time, '%Y-%m-%d') = #{1})
+		where u.company = #{1} 
+
 	 GROUP BY u.id
-	ORDER BY c.create_time desc, u.id asc 
+	ORDER BY cardTime desc, u.id asc 
 	limit #{2}, #{3}
 	</select>
 	<select id="loadApproval" resultType="java.util.HashMap">

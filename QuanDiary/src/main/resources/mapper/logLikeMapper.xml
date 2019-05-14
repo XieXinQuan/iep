@@ -37,7 +37,7 @@
 	<select id="logStatistical" resultType="java.util.HashMap">
 		SELECT 
 	u.display_name as displayName, d.name as deptName,
-			(select count(l.id) from log l where l.user = u.id and DATE_FORMAT(l.create_time, '%Y-%m') = #{createTime}) as logNum,
+			(select count(l.id) from log l where l.user = u.id and DATE_FORMAT(l.create_time, '%Y-%m') = #{createTime} and l.status = 1) as logNum,
 			(select count(lr.id) from log_read lr where lr.user = u.id and DATE_FORMAT(lr.create_time, '%Y-%m') = #{createTime} ) as logReadNum,
 			(select count(ll.id) from log_like ll where ll.user = u.id and DATE_FORMAT(ll.create_time, '%Y-%m') = #{createTime} ) as logLikeNum,
 			(select count(DISTINCT lc.log) from comment lc where lc.user = u.id and DATE_FORMAT(lc.create_time, '%Y-%m') = #{createTime} ) as logCommentNum

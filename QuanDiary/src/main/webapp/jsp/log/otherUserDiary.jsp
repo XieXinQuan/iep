@@ -81,6 +81,9 @@
 				$("#otherUserDiaryQueryDate").hide();
 				$("#otherUserDiaryQueryTime").hide();
 			}
+			if(userType == 3){
+				$("#diaryExport").show();
+			}
 			
 			pageInit();
 		});
@@ -313,6 +316,14 @@
             $("#list2").jqGrid('setGridParam',{
                 datatype:'json',
                 //postData:{"time":time, "id":selectDeptId}, //发送数据
+                postData:{"id":selectDeptId}, //发送数据
+                page:1
+            }).trigger("reloadGrid");
+		}
+		function cradListSearchTime1(){
+            $("#list2").jqGrid('setGridParam',{
+                datatype:'json',
+                //postData:{"time":time, "id":selectDeptId}, //发送数据
                 postData:{"id":selectDeptId, "time":$("#cradListSearchTime").val()}, //发送数据
                 page:1
             }).trigger("reloadGrid");
@@ -401,7 +412,7 @@
 	<body>
 		<div id="otherUserDiaryQuery" style="height:30px;background-color: #D1EEEE;" >
 			
-			<span id="otherUserDiaryQueryDate">请选择查询日期：<input type="date" id="cradListSearchTime" onchange="cradListSearchTime();"></span>
+			<span id="otherUserDiaryQueryDate">请选择查询日期：<input type="date" id="cradListSearchTime" onchange="cradListSearchTime1();"></span>
 			&nbsp;请选择人员：<input id="selectOtherUserName" type="text" readonly="readonly"><input class='handle' type="button" value="选择" onclick="showSelectUserTree(event);">
 			<span id="otherUserDiaryQueryTime">
 			&nbsp;指定时间：<input class="datainp" id="searchListSearchStartTime" type="text" value="" readonly>
@@ -410,7 +421,7 @@
 			<input class="handle" value="确定" onclick="searchDiaryByTime();" type="button">
 			</span>
 			<form id="diaryExport" action="http://localhost:8080/QuanDiary/log/diaryExport.do"
-	        	method="post" style="float:right;">
+	        	method="post" style="float:right;display:none;">
 	        	<input class="handle" value="导出" type="button" onclick="sumbitDiaryExport();">
 	        
 	    	</form>

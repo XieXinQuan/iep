@@ -12,6 +12,7 @@ import QuanDiary.entity.LogTemplate;
 
 public interface LogDao {
 
+	public Integer todayIsFinishLog(Long userId, String time);
 	public void save(Log log);
 	public List<Log> loadMyLog(Long user, Integer pageIndex, Integer pageCount);
 	public Integer countByLoadMyLog(Long user, Integer status);

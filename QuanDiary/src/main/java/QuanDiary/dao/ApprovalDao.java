@@ -16,7 +16,7 @@ public interface ApprovalDao {
 	public void updateApproval(Approval approval);
 	public Approval viewApprovalById(Long id);
 	public void saveApproval(Approval approval);
-	public List<HashMap<String, Object>> loadCard(Long companyId,  String yearMonthDay, Integer page, Integer rows);
+	public List<HashMap<String, Object>> loadCard(String yearMonthDay, Long companyId,  Integer page, Integer rows);
 	public Integer checkUserCard(Long userId, String currDate);
 	public void saveCard(Card card);
 	

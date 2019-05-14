@@ -930,6 +930,23 @@ public class logController {
 		
 		return result;
 	}
+	@RequestMapping("/todayLogWriterFinish.do")
+	@ResponseBody
+	public HashMap<String, Object> todayLogWriterFinish(HttpServletRequest request,HttpServletResponse response,
+			Long id){
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put("msg", "");
+		if(request.getSession().getAttribute("userId") != null){
+			Long userId = Long.parseLong(request.getSession().getAttribute("userId").toString());
+			if(userDao.userType(userId) == UserType.CompanyCommon.getValue()){
+				Integer count = logDao.todayIsFinishLog(userId, new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+				result.put("msg", count == 0? "您今天还没完成日志！":"");
+			}
+		}
+
+		return result;
+	}
+	
 	@RequestMapping("/sumbitDiaryCommentContent.do")
 	@ResponseBody
 	public HashMap<String, Object> sumbitDiaryCommentContent(HttpServletRequest request,HttpServletResponse response,

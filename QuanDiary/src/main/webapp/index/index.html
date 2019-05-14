@@ -46,8 +46,10 @@
 
 	var path = "http://";
 	$(function(){
+		
 		path += window.location.host;
 		loadName();
+		todayLogWriterFinish();
 		setInterval("getTime();",1000);
 		$.ajax({
 			url:path+"/QuanDiary/index/loadMenu.do",
@@ -77,6 +79,7 @@
 				}
 			}
 		});
+		
 		$(".menuContent").live("click", function() {
 			$('#navigationMenu').find('.menuContent').each(function(){
 				$(this).removeClass("menuSelect");
@@ -100,6 +103,17 @@
 		});
 
 	});
+	function todayLogWriterFinish(){
+		$.ajax({
+			url:path+"/QuanDiary/log/todayLogWriterFinish.do",
+			type:"post",
+			data:{},
+			dataType:"json",
+			success:function(result){
+				$("#todayIsFinishLog").html(result.msg);
+			}
+		});
+	}
 	function loadName(){
 		$.ajax({
 			url:path+"/QuanDiary/index/loadName.do",
@@ -156,14 +170,8 @@
 	}
 	
 	function getTime(){
-		var myDate = new Date();
-		var year = myDate.getFullYear();
-		var month = myDate.getMonth()+1;
-		var day = myDate.getDate();
-		var hour = myDate.getHours();
-		var minutes = myDate.getMinutes();
-		var seconds = myDate.getSeconds();
-		$("#currTime").html(year+"-"+month+"-"+day+" "+hour+":"+minutes+":"+seconds); //将值赋给div
+		var time = new Date().Format("yyyy-MM-dd hh:mm:ss")
+		$("#currTime").html(time); //将值赋给div
 	}
 	function closeWindow(){
 		var blockWindow = document.getElementById('blockWindow')
@@ -316,7 +324,7 @@
 	</div>
 	<div id="show" class="floatLeft" style="height:630px;overflow:auto;">
 		
-		<b>欢迎使用员工日志管理系统！</b>
+		<b>欢迎使用员工日志管理系统！<span id="todayIsFinishLog" style="color:red;"></span></b>
 		<img src="../images/index.jpg" alt="员工日志管理系统" style="width:100%;height:600px;;"/>
 		<!-- <div id="tree" class="floatLeft"></div>
 		<div id="content" class="floatLeft"></div> -->

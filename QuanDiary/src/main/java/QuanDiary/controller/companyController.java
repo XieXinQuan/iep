@@ -580,23 +580,17 @@ public class companyController {
 		if(request.getSession().getAttribute("userId") != null){
 			Long userId = Long.parseLong(request.getSession().getAttribute("userId").toString());
 			if(yearMonthDay == null) yearMonthDay = sdf1.format(new Date());
+			//System.out.println(yearMonthDay);
 			Long companyId = userDao.userCompany(userId);
-			List<HashMap<String, Object>> list = approvalDao.loadCard(companyId, yearMonthDay, pageIndex, rows);
+			List<HashMap<String, Object>> list = approvalDao.loadCard( yearMonthDay, companyId, pageIndex, rows);
 			List<HashMap<String, Object>> data = new ArrayList<HashMap<String,Object>>();
 			
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			for(int i = 0;i<list.size();i++){
 				HashMap<String, Object> map = list.get(i);
 				if(map.get("cardTime") == null){
 					map.put("cardMsg", "<span style='color:red;'>未签到</span>");
-					map.put("time", "");
 				}else{
 					map.put("cardMsg", "<span style='color:green;'>已签到</span>");
-					Long time = Long.parseLong(map.get("cardTime").toString());
-					
-					//String time = ;
-					map.put("time", sdf.format(new Date(time*1000)));
-					
 				}
 				data.add(map);
 			}

@@ -27,7 +27,7 @@
 	    	                     {name : 'displayName',index : 'displayName',width : 200, align:"center"}, 
 	    	                     {name : 'deptName',index : 'deptName',width : 100, align:"center"},
 	    	                     {name : 'cardMsg',index : 'cardMsg',width : 200, align:"center"}, 
-	    	                     {name : 'time',index : 'time',width : 200, align:"center"}
+	    	                     {name : 'cardTime',index : 'cardTime',width : 200, align:"center", formatter:changeCardTime}
 	    	                 //    {name : 'status',index : 'status',width : 100, align:"center", formatter: changeStatus},
 	    	                 //    {label: '操作', align: 'center', name: 'state', index: 'state', width: 100, edittype:"button", 
 	    	                 //   	 formatter: function (value, grid, rows, state) { return "<button onclick='show("+rows.id+")'>查看</button>&nbsp;<button onclick='del("+rows.id+")'>删除</button>" } }
@@ -53,6 +53,10 @@
 		pageInit();
 
 	});
+	function changeCardTime(val){
+		if(typeof(val) == 'undefined') return "";
+		return formatTime(val);
+	}
 	function cradListSearchTime(){
 		/*var startTime = new Date($("#cradListSearchTime").val());
 		
