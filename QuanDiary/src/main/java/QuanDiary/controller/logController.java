@@ -544,9 +544,15 @@ public class logController {
 			if(UserType.Admin.getValue() == userDao.userType(currUserId)){
 				Integer pageIndex = (page-1) * rows;
 				Long companyId = id == null ? null : id == 0 ? null : id;
-				List<HashMap<String, Object>> result = logDao.logListDataByAdmin(companyId, time == null ? null : "".equals(time) ? null:time, pageIndex, rows);
+				List<HashMap<String, Object>> result = logDao.logListDataByAdmin(companyId, 
+						 time == null ? null : "".equals(time) ? null:time, 
+								startTime, endTime, pageIndex, rows);
+				//List<HashMap<String, Object>> result = logDao.logListDataByAdmin(companyId, time == null ? null : "".equals(time) ? null:time, pageIndex, rows);
 				jsonObject.put("rows", result);
-				Integer total = logDao.countLogListDataByAdmin(companyId, time == null ? null : "".equals(time) ? null:time);
+				//Integer total = logDao.countLogListDataByAdmin(companyId, time == null ? null : "".equals(time) ? null:time);
+				Integer total = logDao.countLogListDataByAdmin(user.getCompany(), 
+						 time == null ? null : "".equals(time) ? null:time,
+								startTime, endTime);
 				//records当前页展示的数量
 				jsonObject.put("records", total);
 				//total 总页数

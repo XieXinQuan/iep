@@ -174,6 +174,7 @@
 			}
 			if(userType == 4){
 				html += "<button class='handle' onclick='show("+rows.id+")'>查看</button>&nbsp;";
+				html += "<button class='handle' onclick='diaryComment("+rows.id+")'>互动</button>&nbsp;";
 				html += "<button class='handle' onclick='del1("+rows.id+", 1)'>撤销</button>&nbsp;";
 				html += "<button class='handle' onclick='del1("+rows.id+")'>删除</button>&nbsp;";
 			}

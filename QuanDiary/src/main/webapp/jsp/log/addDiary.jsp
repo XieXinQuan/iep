@@ -67,7 +67,7 @@
 							for(var i=0;i<result.content.length;i++){
 								var content = result.content[i];
 								if (content.type == 0){
-									html += "<b>"+content.title+"：</b><textarea id='field"+i+"'></textarea><br>";
+									html += "<b>"+content.title+"：</b><textarea id='field"+i+"' rows='2' cols='50'></textarea><br>";
 									
 									//html += "<b>"+content.title+"：</b><input type='text' id='field"+i+"'><br>";
 								}else if(content.type == 1){
@@ -118,7 +118,7 @@
 							for(var i = 0; i<dateArray.length;i++){
 							    jeDate({
 									dateCell:"#"+dateArray[i],
-									format:"YYYY-MM-DD hh:mm",
+									format:"YYYY-MM-DD",
 									isinitVal:true,
 									isTime:false //isClear:false,
 									//minDate:"2014-09-19 00:00:00",

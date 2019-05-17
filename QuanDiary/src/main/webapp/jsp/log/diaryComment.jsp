@@ -125,7 +125,7 @@
 						<hr>
 			<br>
 			<div id="loadLogComment">
-				<span>发表评论：</span><textarea id="commentContent" placeholder="请输入评论内容"></textarea>
+				<span>发表评论：</span><textarea id="commentContent" rows="3" cols="100" placeholder="请输入评论内容"></textarea>
 				<input type="button" value="评论" onclick="sumbitCommentContent();"> <br>
 				<span style="color:#CD3700;">评论记录：</span><hr>
 			</div>

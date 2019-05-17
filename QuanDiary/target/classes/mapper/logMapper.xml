@@ -52,15 +52,7 @@
 	</select>
 			<!-- 加载其他员工日志列表   公司全部除了某位-->
 	<select id="loadOtherUserLogIsCompany" resultType="java.util.HashMap">
-		<!-- select l.id as id, l.title as title, u.display_name as userName, d.name as deptName, 
-			(select count(lr.id) from log_read lr where lr.log = l.id) as logReadNum,
-			(select count(ll.id) from log_like ll where ll.log = l.id) as logLikeNum,
-			unix_timestamp(l.create_time) as createTime from log l 
-				left join user u on l.user = u.id 
-				LEFT JOIN dept d on d.id = u.dept 
-			where l.status = 1 and l.company = #{0} and u.id != #{1} 
-				ORDER BY l.create_time DESC 
-					LIMIT #{2},#{3}-->
+		
 					
 			select l.id as id, l.title as title, lt.title as moduleTitle, u.display_name as userName, d.name as deptName, 
 			(select count(lr.id) from log_read lr where lr.log = l.id) as logReadNum,
@@ -135,7 +127,8 @@
 
 			select l.id as id, l.title as title, l.template as templateId,
 				lt.title as moduleTitle, u.display_name as userName, d.name as deptName, 
-			DATE_FORMAT(l.create_time,'%Y-%m-%d') as createTime  from log l 
+			DATE_FORMAT(l.create_time,'%Y-%m-%d') as createTime
+			  from log l 
 				left join user u on l.user = u.id 
 				LEFT JOIN dept d on d.id = u.dept 
 				LEFT JOIN log_template lt on lt.id = l.template
@@ -172,17 +165,24 @@
 				c.short_name as companyName, d.name as deptName, l.title as title,
 				(select count(lr.id) from log_read lr where lr.log = l.id) as logReadNum,
 			(select count(ll.id) from log_like ll where ll.log = l.id) as logLikeNum,
+			(select count(lr.id) from log_read lr where lr.log = l.id and lr.user = 1) as isRead,
 					unix_timestamp(l.create_time) as createTime   FROM log l 
 			LEFT JOIN user u on u.id = l.user
 			LEFT JOIN dept d on d.id = u.dept
 			LEFT JOIN company c on c.id = u.company
 		where l.status != 92
-			<if test="company != null">
-				and l.company = #{company}
-			</if>
-			<if test="time != null">
-				and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time}
-			</if>
+					<if test="company != null">
+						and l.company = #{company} 
+					</if>
+
+					<if test="time != null">
+						and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time} 
+					</if>
+					<if test="startTime != null">
+						and l.create_time > #{startTime}
+						and l.create_time &lt; #{endTime}
+						
+					</if>
 		order by l.create_time desc
 		limit #{page}, #{rows}
 		
@@ -193,12 +193,17 @@
 			LEFT JOIN user u on u.id = l.user
 			LEFT JOIN company c on c.id = u.company
 		where l.status != 92
-		<if test="company != null">
-				and l.company = #{company}
-		</if>
-		<if test="time != null">
-				and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time}
-		</if>
+					<if test="company != null">
+						and l.company = #{company} 
+					</if>
+					<if test="time != null">
+						and DATE_FORMAT(l.create_time,'%Y-%m-%d') = #{time} 
+					</if>
+					<if test="startTime != null">
+						and l.create_time > #{startTime}
+						and l.create_time &lt; #{endTime}
+						
+					</if>
 	</select>
 	
 	

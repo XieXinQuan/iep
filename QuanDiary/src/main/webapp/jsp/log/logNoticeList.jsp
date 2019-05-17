@@ -85,7 +85,10 @@
 			return formatTime(val);
 		}
 		function logNoticeOpt(value, grid, rows, state){
-			return "<button class='handle' onclick='show("+rows.id+")'>查看</button>&nbsp;<button class='handle' onclick='del("+rows.id+")'>删除</button>";
+			var html = "<button class='handle' onclick='show("+rows.id+")'>查看</button>&nbsp;";
+			if(userType == 3 || userType == 4) html += "<button class='handle' onclick='del("+rows.id+")'>删除</button>";
+			return html;
+			
 		}
 		function show(id){
 			$.ajax({

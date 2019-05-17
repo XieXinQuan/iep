@@ -37,8 +37,10 @@ public interface LogDao {
 
 	//超级管理员
 	public List<HashMap<String, Object>> logListDataByAdmin(@Param("company") Long company, @Param("time") String time,
-			@Param("page") Integer page, @Param("rows")Integer rows);
-	public Integer countLogListDataByAdmin(@Param("company") Long company, @Param("time") String time);
+			@Param("startTime") String startTime, @Param("endTime") String endTime,
+			@Param("page") Integer page,@Param("rows") Integer rows);
+	public Integer countLogListDataByAdmin(@Param("company") Long company, @Param("time") String time,
+			@Param("startTime") String startTime, @Param("endTime") String endTime);
 	
 	public List<HashMap<String, Object>> logWritingSituation(@Param("time") String time, @Param("type") Integer type, 
 			@Param("companyId") Long companyId, @Param("page") Integer page,@Param("rows") Integer rows);
